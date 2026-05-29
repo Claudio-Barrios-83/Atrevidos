@@ -1,0 +1,109 @@
+{
+  "name": "atrevidos",
+  "version": "1.0.0",
+  "description": "Red social para usuarios liberales - Clon tipo D4swing",
+  "repository": "https://github.com/Claudio-Barrios-83/Atrevidos.git",
+  "stack": {
+    "frontend": "SvelteKit + Tailwind CSS",
+    "backend": "Supabase (PostgreSQL + RLS)",
+    "hosting": "Vercel/Netlify",
+    "auth": "Supabase Auth"
+  },
+  "database": {
+    "provider": "Supabase",
+    "project_id": "ynkhwsbeeyhtmkjjsmoo",
+    "schema_files": [
+      "database/schema.sql",
+      "database/storage-policies.sql",
+      "database/verify-installation.sql"
+    ]
+  },
+  "features": {
+    "core": [
+      "Perfiles de usuario con orientación política",
+      "Posts públicos, followers-only y privados",
+      "Posts anónimos",
+      "Sistema de likes/reacciones",
+      "Comentarios con respuestas anidadas",
+      "Matches (swipe) entre usuarios",
+      "Mensajería directa y grupos",
+      "Moderación y reportes"
+    ],
+    "security": [
+      "Row Level Security (RLS) estricta",
+      "Validación de usernames",
+      "Prevenir reportes duplicados",
+      "Soft deletes para posts y comentarios",
+      "Control de acceso por conexión"
+    ],
+    "automation": [
+      "Creación automática de perfil al registrarse",
+      "Actualización de conteos en tiempo real",
+      "Detección automática de matches mutuos",
+      "Creación automática de conversaciones",
+      "Tracking de última actividad"
+    ]
+  },
+  "installation": {
+    "steps": [
+      {
+        "order": 1,
+        "title": "Crear proyecto en Supabase",
+        "description": "Ir a supabase.com y crear nuevo proyecto",
+        "file": null
+      },
+      {
+        "order": 2,
+        "title": "Ejecutar esquema principal",
+        "description": "Copiar y pegar database/schema.sql en SQL Editor de Supabase",
+        "file": "database/schema.sql"
+      },
+      {
+        "order": 3,
+        "title": "Configurar Storage",
+        "description": "Crear buckets y ejecutar database/storage-policies.sql",
+        "file": "database/storage-policies.sql"
+      },
+      {
+        "order": 4,
+        "title": "Verificar instalación",
+        "description": "Ejecutar database/verify-installation.sql",
+        "file": "database/verify-installation.sql"
+      },
+      {
+        "order": 5,
+        "title": "Crear usuario de prueba",
+        "description": "Añadir usuario via Authentication > Users",
+        "file": null
+      }
+    ]
+  },
+  "files": {
+    "database/": {
+      "schema.sql": "Esquema completo: tablas, índices, triggers, funciones, políticas RLS",
+      "storage-policies.sql": "Políticas de acceso para buckets de archivos",
+      "verify-installation.sql": "Script de validación de instalación",
+      "README.md": "Documentación completa del esquema"
+    }
+  },
+  "credentials_needed": {
+    "supabase_url": "https://ynkhwsbeeyhtmkjjsmoo.supabase.co",
+    "supabase_anon_key": "Obtener de Settings > API",
+    "supabase_service_role_key": "Obtener de Settings > API (solo backend)"
+  },
+  "next_steps": [
+    "Configurar proveedores de email en Supabase Auth",
+    "Personalizar emails de bienvenida y verificación",
+    "Implementar frontend con SvelteKit",
+    "Conectar frontend a Supabase con las keys correctas",
+    "Implementar subida de archivos a Storage",
+    "Configurar webhooks para notificaciones en tiempo real",
+    "Añadir roles de admin/moderador",
+    "Implementar dashboard de moderación",
+    "Configurar backups automáticos en Supabase"
+  ],
+  "contact": {
+    "repo": "https://github.com/Claudio-Barrios-83/Atrevidos.git",
+    "issue_tracker": "https://github.com/Claudio-Barrios-83/Atrevidos/issues"
+  }
+}

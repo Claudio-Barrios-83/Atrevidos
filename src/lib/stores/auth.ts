@@ -3,18 +3,18 @@ import { browser } from '$app/environment';
 import { derived, writable, type Readable } from 'svelte/store';
 import { supabase } from '$lib/supabase/client';
 
-type AuthState = {
+export type AuthState = {
 	user: User | null;
 	session: Session | null;
 	loading: boolean;
 	initialized: boolean;
 };
 
-type AuthSubscription = {
+export type AuthSubscription = {
 	unsubscribe: () => void;
 };
 
-type AuthStore = Readable<AuthState> & {
+export type AuthStore = Readable<AuthState> & {
 	init: () => Promise<AuthState>;
 	signOut: () => Promise<void>;
 	destroy: () => void;

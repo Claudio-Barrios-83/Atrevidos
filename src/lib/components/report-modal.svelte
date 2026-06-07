@@ -9,7 +9,7 @@
     validateReportDraft,
     type ReportTarget
   } from '$lib/reports';
-  import { supabase } from '$lib/supabase';
+  import { supabase } from '$lib/supabase/client';
 
   export let open = false;
   export let reporterId: string | null = null;

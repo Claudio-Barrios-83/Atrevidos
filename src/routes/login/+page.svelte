@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { LEGAL_NOTICE_LINKS } from '$lib/legal';
 	import { auth } from '$lib/stores/auth';
-	import { supabase } from '$lib/supabase';
+	import { supabase } from '$lib/supabase/client';
 
 	let email = '';
 	let password = '';

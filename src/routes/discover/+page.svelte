@@ -1,7 +1,7 @@
 <script lang="ts">
   import { browser } from '$app/environment';
   import { auth } from '$lib/stores/auth';
-  import { supabase } from '$lib/supabase';
+  import { supabase } from '$lib/supabase/client';
   import ProfileCard from '$lib/components/profile-card.svelte';
   import ReportModal from '$lib/components/report-modal.svelte';
   import {

@@ -1,0 +1,8 @@
+<script lang="ts">
+  import LegalPage from '$lib/components/legal-page.svelte';
+  import { getLegalPage } from '$lib/legal';
+
+  const page = getLegalPage('safety');
+</script>
+
+<LegalPage {page} />

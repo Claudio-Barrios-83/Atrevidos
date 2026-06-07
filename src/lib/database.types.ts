@@ -22,6 +22,7 @@ export interface Database {
           display_name: string | null
           bio: string | null
           avatar_url: string | null
+          gallery_urls: string[]
           cover_url: string | null
           location: string | null
           website: string | null
@@ -29,6 +30,11 @@ export interface Database {
           gender: string | null
           political_orientation: string[] | null
           interests: string[] | null
+          relationship_intent: 'amistad' | 'citas' | 'relacion_seria' | 'conocer_personas' | 'aun_explorando' | null
+          relationship_preferences: string | null
+          consent_acknowledged: boolean
+          age_confirmed: boolean
+          onboarding_completed_at: string | null
           is_verified: boolean
           is_active: boolean
           last_active_at: string | null
@@ -41,6 +47,7 @@ export interface Database {
           display_name?: string | null
           bio?: string | null
           avatar_url?: string | null
+          gallery_urls?: string[]
           cover_url?: string | null
           location?: string | null
           website?: string | null
@@ -48,6 +55,11 @@ export interface Database {
           gender?: string | null
           political_orientation?: string[] | null
           interests?: string[] | null
+          relationship_intent?: 'amistad' | 'citas' | 'relacion_seria' | 'conocer_personas' | 'aun_explorando' | null
+          relationship_preferences?: string | null
+          consent_acknowledged?: boolean
+          age_confirmed?: boolean
+          onboarding_completed_at?: string | null
           is_verified?: boolean
           is_active?: boolean
           last_active_at?: string | null
@@ -60,6 +72,7 @@ export interface Database {
           display_name?: string | null
           bio?: string | null
           avatar_url?: string | null
+          gallery_urls?: string[]
           cover_url?: string | null
           location?: string | null
           website?: string | null
@@ -67,12 +80,18 @@ export interface Database {
           gender?: string | null
           political_orientation?: string[] | null
           interests?: string[] | null
+          relationship_intent?: 'amistad' | 'citas' | 'relacion_seria' | 'conocer_personas' | 'aun_explorando' | null
+          relationship_preferences?: string | null
+          consent_acknowledged?: boolean
+          age_confirmed?: boolean
+          onboarding_completed_at?: string | null
           is_verified?: boolean
           is_active?: boolean
           last_active_at?: string | null
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       posts: {
         Row: {
@@ -123,6 +142,15 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: 'posts_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          }
+        ]
       }
       likes: {
         Row: {
@@ -146,6 +174,22 @@ export interface Database {
           reaction_type?: 'like' | 'love' | 'like-liberal' | 'agreement'
           created_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: 'likes_post_id_fkey'
+            columns: ['post_id']
+            isOneToOne: false
+            referencedRelation: 'posts'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'likes_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          }
+        ]
       }
       comments: {
         Row: {
@@ -184,6 +228,29 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: 'comments_parent_comment_id_fkey'
+            columns: ['parent_comment_id']
+            isOneToOne: false
+            referencedRelation: 'comments'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'comments_post_id_fkey'
+            columns: ['post_id']
+            isOneToOne: false
+            referencedRelation: 'posts'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'comments_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          }
+        ]
       }
       matches: {
         Row: {
@@ -210,6 +277,85 @@ export interface Database {
           is_mutual?: boolean
           created_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: 'matches_target_user_id_fkey'
+            columns: ['target_user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'matches_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      reports: {
+        Row: {
+          id: string
+          reporter_id: string
+          target_type: 'user' | 'post' | 'comment' | 'message'
+          target_id: string
+          category: 'spam' | 'harassment' | 'hate_speech' | 'false_info' | 'inappropriate_content' | 'other'
+          reason: string
+          status: 'pending' | 'under_review' | 'resolved' | 'dismissed' | null
+          reviewed_by: string | null
+          reviewed_at: string | null
+          resolution_notes: string | null
+          is_action_taken: boolean | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          reporter_id: string
+          target_type: 'user' | 'post' | 'comment' | 'message'
+          target_id: string
+          category: 'spam' | 'harassment' | 'hate_speech' | 'false_info' | 'inappropriate_content' | 'other'
+          reason: string
+          status?: 'pending' | 'under_review' | 'resolved' | 'dismissed' | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          resolution_notes?: string | null
+          is_action_taken?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          reporter_id?: string
+          target_type?: 'user' | 'post' | 'comment' | 'message'
+          target_id?: string
+          category?: 'spam' | 'harassment' | 'hate_speech' | 'false_info' | 'inappropriate_content' | 'other'
+          reason?: string
+          status?: 'pending' | 'under_review' | 'resolved' | 'dismissed' | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          resolution_notes?: string | null
+          is_action_taken?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'reports_reporter_id_fkey'
+            columns: ['reporter_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'reports_reviewed_by_fkey'
+            columns: ['reviewed_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          }
+        ]
       }
     }
     Views: {}

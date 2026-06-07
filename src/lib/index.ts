@@ -1,5 +1,3 @@
-import * as supabaseClient from './supabase/client';
-import * as authStore from './stores/auth';
-import type * as types from './types';
-
-export { supabaseClient, authStore, types };
+export { supabase, getSession, getUser } from './supabase/client';
+export { auth, currentUser, isAuthenticated, isLoading } from './stores/auth';
+export type * from './types';

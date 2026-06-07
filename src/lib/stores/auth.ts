@@ -1,64 +1,131 @@
-/// <reference types="@sveltejs/kit" />
-
-import type { SupabaseClient, User } from '@supabase/supabase-js';
+import type { Session, User } from '@supabase/supabase-js';
 import { browser } from '$app/environment';
-import { writable, derived, get } from 'svelte/store';
-import { getSupabaseClient } from './client';
+import { derived, writable, type Readable } from 'svelte/store';
+import { supabase } from '$lib/supabase/client';
 
-let supabase: SupabaseClient;
+type AuthState = {
+	user: User | null;
+	session: Session | null;
+	loading: boolean;
+	initialized: boolean;
+};
 
-function createAuthStore() {
-	const { subscribe, set, update } = writable<{
-		user: User | null;
-		session: any | null;
-		loading: boolean;
-	}>({
-		user: null,
-		session: null,
-		loading: true
+type AuthSubscription = {
+	unsubscribe: () => void;
+};
+
+type AuthStore = Readable<AuthState> & {
+	init: () => Promise<AuthState>;
+	signOut: () => Promise<void>;
+	destroy: () => void;
+};
+
+const initialState: AuthState = {
+	user: null,
+	session: null,
+	loading: browser,
+	initialized: false
+};
+
+let client: typeof supabase | null = null;
+let state = initialState;
+let authSubscription: AuthSubscription | null = null;
+let initPromise: Promise<AuthState> | null = null;
+
+function createAuthStore(): AuthStore {
+	const { subscribe, set } = writable<AuthState>(initialState, () => {
+		void store.init();
+
+		return () => undefined;
 	});
 
-	return {
+	const updateState = (
+		session: Session | null,
+		{ loading = false, initialized = state.initialized } = {}
+	) => {
+		state = {
+			user: session?.user ?? null,
+			session,
+			loading,
+			initialized
+		};
+
+		set(state);
+	};
+
+	const registerAuthListener = () => {
+		if (!client || authSubscription) return;
+
+		const {
+			data: { subscription }
+		} = client.auth.onAuthStateChange((_event, session) => {
+			updateState(session);
+		});
+
+		authSubscription = subscription;
+	};
+
+	const store = {
 		subscribe,
 		init: async () => {
-			if (!browser) return;
+			if (!browser) {
+				updateState(null, { loading: false, initialized: true });
+				return state;
+			}
 
-			supabase = getSupabaseClient();
+			if (state.initialized) {
+				return state;
+			}
 
-			// Get initial session
-			const {
-				data: { session }
-			} = await supabase.auth.getSession();
-			
-			set({
-				user: session?.user ?? null,
-				session,
-				loading: false
-			});
+			if (initPromise) {
+				return initPromise;
+			}
 
-			// Listen for auth changes
-			supabase.auth.onAuthStateChange((_event, session) => {
-				set({
-					user: session?.user ?? null,
-					session,
-					loading: false
+			client = supabase;
+			registerAuthListener();
+			updateState(state.session, { loading: true, initialized: false });
+
+			initPromise = client.auth
+				.getSession()
+				.then(({ data: { session } }) => {
+					updateState(session, { loading: false, initialized: true });
+					return state;
+				})
+				.catch((error) => {
+					updateState(null, { loading: false, initialized: true });
+					console.error('Error getting session:', error);
+					return state;
+				})
+				.finally(() => {
+					initPromise = null;
 				});
-			});
+
+			return initPromise;
 		},
 		signOut: async () => {
-			if (!supabase) supabase = getSupabaseClient();
-			await supabase.auth.signOut();
+			if (!browser) return;
+
+			await store.init();
+
+			const { error } = await client!.auth.signOut();
+
+			if (error) {
+				throw error;
+			}
+		},
+		destroy: () => {
+			authSubscription?.unsubscribe();
+			authSubscription = null;
+			initPromise = null;
+			state = initialState;
+			set(state);
 		}
 	};
+
+	return store;
 }
 
 export const auth = createAuthStore();
-
-// Derived store for just the user
 export const currentUser = derived(auth, ($auth) => $auth.user);
-
-// Derived store for loading state
 export const isLoading = derived(auth, ($auth) => $auth.loading);
-
-// Derived store for authenticated state
 export const isAuthenticated = derived(auth, ($auth) => !!$auth.user);

@@ -1,15 +1,24 @@
 import { browser } from '$app/environment';
-import { supabase } from '$lib/supabase';
+import { auth } from '$lib/stores/auth';
+import { get } from 'svelte/store';
 import type { LayoutLoad } from './$types';
 
+export const ssr = false;
+
 export const load: LayoutLoad = async () => {
-  let session = null;
+	let session = null;
 
-  if (browser) {
-    session = (await supabase.auth.getSession()).data.session;
-  }
+	if (browser) {
+		try {
+			await auth.init();
+		} catch (error) {
+			console.error('No se pudo inicializar la sesión:', error);
+		}
 
-  return {
-    session
-  };
+		session = get(auth).session;
+	}
+
+	return {
+		session
+	};
 };

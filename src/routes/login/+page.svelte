@@ -261,7 +261,7 @@
 							>
 								{link.label.toLowerCase()}
 								<span class="sr-only"> (se abre en una nueva pestaña)</span>
-							</a>{#if index < LEGAL_NOTICE_LINKS.length - 2},{:else if index === LEGAL_NOTICE_LINKS.length - 2} y {/if}
+							</a>{#if index < LEGAL_NOTICE_LINKS.length - 1}{index === LEGAL_NOTICE_LINKS.length - 2 ? ' y ' : ', '}{/if}
 						{/each}.
 					</p>
 				</div>
@@ -287,4 +287,3 @@
 		</div>
 	</div>
 {/if}
-// Verified route

@@ -12,7 +12,7 @@
     createDirectConversationRecoveryClient,
     recoverDirectConversationIds
   } from '$lib/direct-conversation-recovery';
-  import { supabase } from '$lib/supabase/client';
+  import { supabase } from '$lib/supabase';
   import { resolveStorageImageUrl } from '$lib/supabase/profile-media';
 
   const USER_CONVERSATIONS_VIEW = 'user_conversations' as never;

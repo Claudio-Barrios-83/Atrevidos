@@ -1,6 +1,6 @@
 <script lang="ts">
   import { auth } from '$lib/stores/auth';
-  import { supabase } from '$lib/supabase/client';
+  import { supabase } from '$lib/supabase';
   import { resolveStorageImageUrl } from '$lib/supabase/profile-media';
   import {
     createDirectConversationRecoveryClient,

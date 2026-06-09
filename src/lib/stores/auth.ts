@@ -1,7 +1,7 @@
 import type { Session, User } from '@supabase/supabase-js';
 import { browser } from '$app/environment';
 import { derived, writable, type Readable } from 'svelte/store';
-import { supabase } from '$lib/supabase/client';
+import { supabase } from '$lib/supabase';
 
 export type AuthState = {
 	user: User | null;

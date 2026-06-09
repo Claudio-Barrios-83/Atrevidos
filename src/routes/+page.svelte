@@ -44,7 +44,7 @@
   import { saveDiscoverMatch } from '$lib/discover-actions';
   import { auth } from '$lib/stores/auth';
   import ReportModal from '$lib/components/report-modal.svelte';
-  import { supabase } from '$lib/supabase/client';
+  import { supabase } from '$lib/supabase';
   import { resolveStorageImageUrl } from '$lib/supabase/profile-media';
   import { deletePostImage, resolvePostImageUrls, uploadPostImage } from '$lib/supabase/post-media';
   import type { Database } from '$lib/database.types';

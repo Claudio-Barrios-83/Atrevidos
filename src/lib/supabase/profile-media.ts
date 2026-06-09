@@ -1,4 +1,4 @@
-import { supabase } from '$lib/supabase/client';
+import { supabase } from '$lib/supabase';
 import type { Database } from '$lib/database.types';
 import {
   AVATAR_BUCKET,

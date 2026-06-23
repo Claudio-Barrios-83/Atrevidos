@@ -1,0 +1,8 @@
+*** Begin Patch
+*** Update File: docs/plans/2026-06-04-atrevidos-mvp-plan.md
+@@ -66,7 +66,7 @@
+ **Files:**
+-- Rename: `src/routes/login/page.svelte` -> `src/routes/login/+page.svelte`
++- Note: `src/routes/(auth)/login/+page.svelte` follows SvelteKit group routing conventions.
+ - Review: `src/routes/+layout.ts`
+*** End Patch

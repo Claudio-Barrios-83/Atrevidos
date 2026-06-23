@@ -1,4 +1,3 @@
-export { supabase, getSession, getUser } from './supabase/client';
-export type { AuthState, AuthStore } from './stores/auth';
-export { auth, currentUser, isAuthenticated, isLoading } from './stores/auth';
+export { supabase, getSession, getUser } from '$lib/supabase/client';
+export { auth, currentUser, isAuthenticated, isLoading, type AuthState, type AuthStore } from './stores/auth';
 export type * from './types';

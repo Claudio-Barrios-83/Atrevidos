@@ -17,8 +17,8 @@
     type DirectMessageRow
   } from '$lib/messages';
   import type { ReportTarget } from '$lib/reports';
-  import { auth } from '$lib/stores/auth';
-  import { supabase } from '$lib/supabase';
+  import { auth } from '$lib';
+  import { supabase } from '$lib/supabase/client';
   import { resolveStorageImageUrl } from '$lib/supabase/profile-media';
   import { onDestroy, tick } from 'svelte';
 

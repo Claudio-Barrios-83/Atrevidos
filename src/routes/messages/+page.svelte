@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { auth } from '$lib/stores/auth';
+  import { auth } from '$lib';
   import {
     buildConversationListItems,
     finalizeConversationListItems,
@@ -12,7 +12,7 @@
     createDirectConversationRecoveryClient,
     recoverDirectConversationIds
   } from '$lib/direct-conversation-recovery';
-  import { supabase } from '$lib/supabase';
+  import { supabase } from '$lib/supabase/client';
   import { resolveStorageImageUrl } from '$lib/supabase/profile-media';
 
   const USER_CONVERSATIONS_VIEW = 'user_conversations' as never;

@@ -1,9 +1,3 @@
-/**
- * This file was automatically generated.
- * DO NOT MODIFY IT BY HAND. Instead, modify the source SQL schema
- * and run `supabase gen types typescript --project-id ynkhwsbeeythmkgjjsmoo > src/lib/database.types.ts`
- */
-
 export type Json =
   | string
   | number
@@ -142,15 +136,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: 'posts_user_id_fkey'
-            columns: ['user_id']
-            isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
-          }
-        ]
+        Relationships: []
       }
       likes: {
         Row: {
@@ -174,22 +160,7 @@ export interface Database {
           reaction_type?: 'like' | 'love' | 'like-liberal' | 'agreement'
           created_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: 'likes_post_id_fkey'
-            columns: ['post_id']
-            isOneToOne: false
-            referencedRelation: 'posts'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'likes_user_id_fkey'
-            columns: ['user_id']
-            isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
-          }
-        ]
+        Relationships: []
       }
       comments: {
         Row: {
@@ -228,29 +199,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: 'comments_parent_comment_id_fkey'
-            columns: ['parent_comment_id']
-            isOneToOne: false
-            referencedRelation: 'comments'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'comments_post_id_fkey'
-            columns: ['post_id']
-            isOneToOne: false
-            referencedRelation: 'posts'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'comments_user_id_fkey'
-            columns: ['user_id']
-            isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
-          }
-        ]
+        Relationships: []
       }
       matches: {
         Row: {
@@ -277,22 +226,7 @@ export interface Database {
           is_mutual?: boolean
           created_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: 'matches_target_user_id_fkey'
-            columns: ['target_user_id']
-            isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'matches_user_id_fkey'
-            columns: ['user_id']
-            isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
-          }
-        ]
+        Relationships: []
       }
       reports: {
         Row: {
@@ -340,22 +274,7 @@ export interface Database {
           created_at?: string | null
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: 'reports_reporter_id_fkey'
-            columns: ['reporter_id']
-            isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'reports_reviewed_by_fkey'
-            columns: ['reviewed_by']
-            isOneToOne: false
-            referencedRelation: 'profiles'
-            referencedColumns: ['id']
-          }
-        ]
+        Relationships: []
       }
     }
     Views: {}

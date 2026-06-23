@@ -10,10 +10,6 @@ export type AuthState = {
 	initialized: boolean;
 };
 
-export type AuthSubscription = {
-	unsubscribe: () => void;
-};
-
 export type AuthStore = Readable<AuthState> & {
 	init: () => Promise<AuthState>;
 	signOut: () => Promise<void>;
@@ -27,22 +23,37 @@ const initialState: AuthState = {
 	initialized: false
 };
 
-let client: typeof supabase | null = null;
 let state = initialState;
-let authSubscription: AuthSubscription | null = null;
+let authSubscription: { unsubscribe: () => void } | null = null;
 let initPromise: Promise<AuthState> | null = null;
 
 function createAuthStore(): AuthStore {
 	const { subscribe, set } = writable<AuthState>(initialState, () => {
+		// Start init when first subscriber arrives
 		void store.init();
-
-		return () => undefined;
+		return () => {
+            // Only unsubscribe if we have a valid subscription object
+            if (authSubscription) {
+                authSubscription.unsubscribe();
+                authSubscription = null;
+            }
+        };
 	});
 
 	const updateState = (
 		session: Session | null,
-		{ loading = false, initialized = state.initialized } = {}
+		{ loading = false, initialized = true } = {}
 	) => {
+		// Only update if something actually changed to avoid unnecessary re-renders
+		if (
+			state.user?.id === session?.user?.id &&
+			state.session?.access_token === session?.access_token &&
+			state.loading === loading &&
+			state.initialized === initialized
+		) {
+			return;
+		}
+
 		state = {
 			user: session?.user ?? null,
 			session,
@@ -54,11 +65,11 @@ function createAuthStore(): AuthStore {
 	};
 
 	const registerAuthListener = () => {
-		if (!client || authSubscription) return;
+		if (authSubscription) return;
 
 		const {
 			data: { subscription }
-		} = client.auth.onAuthStateChange((_event, session) => {
+		} = supabase.auth.onAuthStateChange((_event, session) => {
 			updateState(session);
 		});
 
@@ -81,11 +92,10 @@ function createAuthStore(): AuthStore {
 				return initPromise;
 			}
 
-			client = supabase;
 			registerAuthListener();
 			updateState(state.session, { loading: true, initialized: false });
 
-			initPromise = client.auth
+			initPromise = supabase.auth
 				.getSession()
 				.then(({ data: { session } }) => {
 					updateState(session, { loading: false, initialized: true });
@@ -107,15 +117,17 @@ function createAuthStore(): AuthStore {
 
 			await store.init();
 
-			const { error } = await client!.auth.signOut();
+			const { error } = await supabase.auth.signOut();
 
 			if (error) {
 				throw error;
 			}
 		},
 		destroy: () => {
-			authSubscription?.unsubscribe();
-			authSubscription = null;
+            if (authSubscription) {
+                authSubscription.unsubscribe();
+                authSubscription = null;
+            }
 			initPromise = null;
 			state = initialState;
 			set(state);

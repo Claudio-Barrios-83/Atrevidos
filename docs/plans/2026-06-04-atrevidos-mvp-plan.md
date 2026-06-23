@@ -64,7 +64,7 @@ This means the first milestone is **stabilization**, not feature expansion.
 **Objective:** Make the app compile under valid SvelteKit routing.
 
 **Files:**
-- Rename: `src/routes/login/page.svelte` -> `src/routes/login/+page.svelte`
+- Note: `src/routes/(auth)/login/+page.svelte` follows SvelteKit group routing conventions.
 - Review: `src/routes/+layout.ts`
 
 **Verification:**

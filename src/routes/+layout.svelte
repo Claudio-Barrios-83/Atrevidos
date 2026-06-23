@@ -5,7 +5,7 @@
   import { decideAuthRedirect, type OnboardingStatus } from '$lib/auth-routing';
   import { shouldRefreshOnboardingState } from '$lib/onboarding-routing';
   import { loadOnboardingState, onboardingStateRevision } from '$lib/onboarding';
-  import { auth } from '$lib/stores/auth';
+  import { auth } from '$lib';
 
   let redirecting = false;
   let onboardingLoading = false;
@@ -110,5 +110,20 @@
     </div>
   </div>
 {:else}
+  {#if $auth.user}
+    <button
+    onclick={async () => {
+      try {
+        await auth.signOut();
+      } catch (err) {
+        console.error('Logout failed:', err);
+        alert('No se pudo cerrar sesión');
+      }
+    }}
+    class="fixed right-4 top-4 rounded bg-red-500 p-2 text-white transition hover:bg-red-600"
+  >
+    Cerrar sesión
+  </button>
+  {/if}
   <slot />
 {/if}

@@ -1,1 +1,4 @@
-Let me run the check command to verify the implementation
+
+> atrevidos@1.0.0 check
+> svelte-kit sync && npx tsc --noEmit
+

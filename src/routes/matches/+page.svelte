@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { auth } from '$lib/stores/auth';
-  import { supabase } from '$lib/supabase';
+  import { auth } from '$lib';
+  import { supabase } from '$lib/supabase/client';
   import { resolveStorageImageUrl } from '$lib/supabase/profile-media';
   import {
     createDirectConversationRecoveryClient,
@@ -179,7 +179,7 @@
       for (const blockedUserId of locallyBlockedMatchUserIds) {
         blockedUserIds.add(blockedUserId);
       }
-      const items = buildMatchListItems((data ?? []) as MutualMatchRow[], blockedUserIds);
+      const items = buildMatchListItems((data ?? []) as unknown as MutualMatchRow[], blockedUserIds);
       const resolvedItems = await resolveMatchAvatars(items);
       const conversationIdByMatchedUser = await loadConversationIdsByMatchedUser(
         user.id,

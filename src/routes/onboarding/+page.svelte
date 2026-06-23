@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { LEGAL_NOTICE_LINKS } from '$lib/legal';
-  import { auth } from '$lib/stores/auth';
+  import { auth } from '$lib';
   import {
     buildOnboardingFormValues,
     EMPTY_ONBOARDING_FORM,

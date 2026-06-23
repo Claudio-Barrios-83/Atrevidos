@@ -42,9 +42,9 @@
     type PostMutationVersions
   } from '$lib/reactions';
   import { saveDiscoverMatch } from '$lib/discover-actions';
-  import { auth } from '$lib/stores/auth';
+  import { auth } from '$lib';
   import ReportModal from '$lib/components/report-modal.svelte';
-  import { supabase } from '$lib/supabase';
+  import { supabase } from '$lib/supabase/client';
   import { resolveStorageImageUrl } from '$lib/supabase/profile-media';
   import { deletePostImage, resolvePostImageUrls, uploadPostImage } from '$lib/supabase/post-media';
   import type { Database } from '$lib/database.types';
@@ -294,7 +294,7 @@
       }
 
       const blockedUserIds = collectBlockedUserIds((blockedRows ?? []) as DiscoverMatchRow[], requestUserId);
-      const visibleComments = excludeRowsFromBlockedUsers((data ?? []) as RawFeedComment[], blockedUserIds);
+      const visibleComments = excludeRowsFromBlockedUsers((data ?? []) as unknown as RawFeedComment[], blockedUserIds);
       const normalizedComments = normalizeFeedComments(visibleComments);
 
       updateCommentState(postId, (state) => ({
@@ -395,7 +395,7 @@
         throw error;
       }
 
-      const createdComment = normalizeFeedComments([data as RawFeedComment])[0];
+      const createdComment = normalizeFeedComments([data as unknown as RawFeedComment])[0];
 
       if (!createdComment) {
         throw new Error('No pudimos preparar el comentario creado.');

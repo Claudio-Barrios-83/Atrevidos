@@ -1,21 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Session, SupabaseClient, User } from '@supabase/supabase-js';
+import type { SupabaseClient, Session, User } from '@supabase/supabase-js';
 import type { Database } from '$lib/database.types';
 
-function createSupabaseClient(): SupabaseClient<Database> {
-	const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-	const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL ?? '';
+const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
 
-	if (!supabaseUrl || !supabaseAnonKey) {
-		throw new Error(
-			'Missing Supabase environment variables. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.'
-		);
-	}
-
-	return createClient<Database>(supabaseUrl, supabaseAnonKey);
-}
-
-export const supabase = createSupabaseClient();
+export const supabase: SupabaseClient<Database> = createClient<Database>(
+	supabaseUrl,
+	supabaseAnonKey
+);
 
 export async function getSession(): Promise<Session | null> {
 	const {

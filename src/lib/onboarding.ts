@@ -1,7 +1,7 @@
 import type { User } from '@supabase/supabase-js';
 import { writable } from 'svelte/store';
 import type { Database } from '$lib/database.types';
-import { supabase } from '$lib/supabase';
+import { supabase } from '$lib/supabase/client';
 
 export type ProfileRow = Pick<
 	Database['public']['Tables']['profiles']['Row'],

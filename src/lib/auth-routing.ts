@@ -8,7 +8,7 @@ type DecideAuthRedirectOptions = {
   onboardingStatus: OnboardingStatus;
 };
 
-const publicRoutes = new Set(['/login', ...LEGAL_ROUTE_PATHS]);
+  const publicRoutes = new Set(['/login', '/signup', ...LEGAL_ROUTE_PATHS]);
 
 export function decideAuthRedirect({
   pathname,
@@ -18,12 +18,12 @@ export function decideAuthRedirect({
   const isPublicRoute = publicRoutes.has(pathname);
   const requiresOnboarding = onboardingStatus === 'incomplete';
 
-  if (!isAuthenticated) {
-    return isPublicRoute ? null : '/login';
+  if (!isAuthenticated && !isPublicRoute) {
+    return '/login';
   }
 
-  if (pathname === '/login') {
-    return requiresOnboarding ? '/onboarding' : '/';
+  if (pathname === '/login' || pathname === '/signup') {
+    return isAuthenticated ? (requiresOnboarding ? '/onboarding' : '/') : null;
   }
 
   if (requiresOnboarding && pathname !== '/onboarding' && !isPublicRoute) {

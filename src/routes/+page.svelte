@@ -49,6 +49,8 @@
   import { deletePostImage, resolvePostImageUrls, uploadPostImage } from '$lib/supabase/post-media';
   import type { Database } from '$lib/database.types';
   import type { ReportTarget } from '$lib/reports';
+  import LoadingState from '$lib/components/loading-state.svelte';
+  import ErrorState from '$lib/components/error-state.svelte';
 
   type SelectedPostImage = {
     id: string;
@@ -958,9 +960,14 @@
         type="button"
         on:click={createPost}
         disabled={publishing || (!newPostContent.trim() && selectedPostImages.length === 0)}
-        class="rounded-lg bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+        class="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {#if publishing}Publicando...{:else}Publicar{/if}
+        {#if publishing}
+          <div class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+          Publicando...
+        {:else}
+          Publicar
+        {/if}
       </button>
     </div>
 
@@ -978,21 +985,9 @@
   </section>
 
   {#if loading}
-    <div class="py-12 text-center">
-      <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
-      <p class="mt-4 text-gray-600 dark:text-gray-400">Cargando publicaciones...</p>
-    </div>
+    <LoadingState message="Cargando publicaciones..." />
   {:else if feedError}
-    <div class="rounded-xl bg-red-50 p-6 text-center dark:bg-red-950/30">
-      <p class="text-sm text-red-700 dark:text-red-300">{feedError}</p>
-      <button
-        type="button"
-        on:click={loadPosts}
-        class="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
-      >
-        Reintentar
-      </button>
-    </div>
+    <ErrorState message={feedError} retry={loadPosts} />
   {:else if posts.length === 0}
     <div class="rounded-xl bg-gray-50 py-12 text-center dark:bg-gray-800">
       <p class="text-gray-500 dark:text-gray-400">Aún no hay publicaciones públicas. ¡Sé la primera persona en compartir algo!</p>

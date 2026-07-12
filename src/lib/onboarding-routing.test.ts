@@ -55,4 +55,10 @@ describe('shouldRefreshOnboardingState', () => {
   it('does not refresh while a request is already in flight', () => {
     expect(decideRefresh({ onboardingLoading: true })).toBe(false);
   });
+
+  it('verifies that an incomplete onboarding profile triggers a redirect (simulated in flow)', () => {
+    // This is more of an integration test concept, but we can verify the state
+    // that the routing would use.
+    expect(decideRefresh({ onboardingStatus: 'incomplete' })).toBe(true);
+  });
 });

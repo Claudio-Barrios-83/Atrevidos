@@ -1,6 +1,7 @@
 import { isOnboardingComplete } from '$lib/onboarding';
 import { createServerClient } from '@supabase/ssr';
 import type { Handle } from '@sveltejs/kit';
+import { decideAuthRedirect, type OnboardingStatus } from '$lib/auth-routing';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.supabase = createServerClient(import.meta.env.PUBLIC_SUPABASE_URL, import.meta.env.PUBLIC_SUPABASE_ANON_KEY, {
@@ -23,34 +24,29 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	// Auth Guard logic
 	const session = await event.locals.getSession();
-	const protectedRoutes = ['/feed', '/profile', '/discover', '/matches', '/messages', '/create'];
-	const publicRoutes = ['/login', '/signup', '/privacy', '/terms', '/safety'];
 
-	const isProtectedRoute = protectedRoutes.some(route => event.url.pathname.startsWith(route));
-	const isPublicRoute = publicRoutes.some(route => event.url.pathname.startsWith(route));
-
-	if (isProtectedRoute && !session) {
-		return Response.redirect(new URL('/login', event.url.origin), 303);
-	}
-	
-	if (session) {
-		const { data: profile } = await event.locals.supabase
-			.from('profiles')
-			.select('id, username, display_name, bio, avatar_url, gallery_urls, location, interests, relationship_intent, relationship_preferences, consent_acknowledged, age_confirmed, onboarding_completed_at')
-			.eq('id', session.user.id)
-			.maybeSingle();
-
-		if (!isOnboardingComplete(profile) && event.url.pathname !== '/onboarding') {
-			return Response.redirect(new URL('/onboarding', event.url.origin), 303);
-		}
-        
-        // Redirect away from auth routes if already authenticated and onboarded
-        if ((event.url.pathname === '/login' || event.url.pathname === '/signup') && isOnboardingComplete(profile)) {
-            return Response.redirect(new URL('/feed', event.url.origin), 303);
+    let onboardingStatus: string = 'unknown';
+    if (session) {
+        try {
+            const { data } = await event.locals.supabase
+                .from('profiles')
+                .select('onboarding_completed_at')
+                .eq('id', session.user.id)
+                .maybeSingle();
+            onboardingStatus = data?.onboarding_completed_at ? 'complete' : 'incomplete';
+        } catch (e) {
+            onboardingStatus = 'error';
         }
-	} else if (event.url.pathname === '/onboarding') {
-        // Redirect anonymous users away from onboarding
-        return Response.redirect(new URL('/login', event.url.origin), 303);
+    }
+
+	const redirectPath = decideAuthRedirect({
+        pathname: event.url.pathname,
+        isAuthenticated: !!session,
+        onboardingStatus: onboardingStatus as OnboardingStatus
+    });
+
+    if (redirectPath) {
+        return Response.redirect(new URL(redirectPath, event.url.origin), 303);
     }
 
 	return resolve(event, {

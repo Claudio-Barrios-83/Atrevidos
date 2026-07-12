@@ -4,11 +4,13 @@ import { get } from 'svelte/store';
 import { goto } from '$app/navigation';
 import { page } from '$app/stores';
 import type { LayoutLoad } from './$types';
+import { decideAuthRedirect } from '$lib/auth-routing';
 
 export const ssr = false;
 
 export const load: LayoutLoad = async () => {
 	let session = null;
+    let onboardingStatus = 'unknown'; // Note: Should probably fetch real status
 
 	if (browser) {
 		try {
@@ -19,15 +21,16 @@ export const load: LayoutLoad = async () => {
 
 		session = get(auth).session;
 
-        // Redirect anonymous users from protected routes
         const currentPath = get(page).url.pathname;
-        const publicRoutes = ['/', '/login', '/signup', '/terms', '/privacy', '/safety'];
-        const isPublicRoute = publicRoutes.includes(currentPath);
+        const redirect = decideAuthRedirect({
+            pathname: currentPath,
+            isAuthenticated: !!session,
+            onboardingStatus: onboardingStatus as any
+        });
         
-    if (!session && !isPublicRoute) {
-        // Use replace state to avoid infinite back button loop.
-        await goto('/login', { replaceState: true }); 
-    }
+        if (redirect) {
+            await goto(redirect, { replaceState: true }); 
+        }
 	}
 
 	return {

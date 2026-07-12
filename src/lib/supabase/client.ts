@@ -2,8 +2,10 @@ import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient, Session, User } from '@supabase/supabase-js';
 import type { Database } from '$lib/database.types';
 
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL ?? '';
-const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+// ⚠️ REEMPLAZA ESTE VALOR con tu clave 'anon public' del dashboard de Supabase.
+// Esta clave es segura para el frontend, no tiene permisos de admin.
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
 
 export const supabase: SupabaseClient<Database> = createClient<Database>(
 	supabaseUrl,

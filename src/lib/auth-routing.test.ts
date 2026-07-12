@@ -13,11 +13,16 @@ const decide = ({
 
 describe('decideAuthRedirect', () => {
   it('redirects anonymous users on protected routes to /login', () => {
+    expect(decide({ pathname: '/feed', isAuthenticated: false })).toBe('/login');
     expect(decide({ pathname: '/', isAuthenticated: false })).toBe('/login');
   });
 
   it('allows anonymous users to stay on /login', () => {
     expect(decide({ pathname: '/login', isAuthenticated: false })).toBeNull();
+  });
+
+  it('allows anonymous users to stay on /signup', () => {
+    expect(decide({ pathname: '/signup', isAuthenticated: false })).toBeNull();
   });
 
   it('allows anonymous users to open the legal notice pages', () => {

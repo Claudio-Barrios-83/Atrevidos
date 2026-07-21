@@ -22,7 +22,9 @@
   import { RELATIONSHIP_INTENT_OPTIONS } from '$lib/onboarding';
   import type { ReportTarget } from '$lib/reports';
   import { resolveStorageImageUrl } from '$lib/supabase/profile-media';
-  type DiscoverAction = 'like' | 'pass' | 'block';
+  import AppShell from '$lib/components/app-shell.svelte';
+  import { isSubscriptionActive, type SubscriptionRow } from '$lib/subscription';
+  type DiscoverAction = 'like' | 'pass' | 'block' | 'super-like';
 
   let activeUserId: string | null = null;
   let latestRequest = 0;
@@ -39,6 +41,25 @@
   let actionSuccessMessage = '';
   let reportModalOpen = false;
   let reportTarget: ReportTarget | null = null;
+  let subscription: SubscriptionRow | null = null;
+  let signingOut = false;
+
+  $: hasActiveSubscription = isSubscriptionActive(subscription);
+
+  async function loadSubscriptionStatus(userId: string) {
+    const { data } = await supabase.from('subscriptions').select('*').eq('user_id', userId).maybeSingle();
+    subscription = (data as SubscriptionRow | null) ?? null;
+  }
+
+  async function handleSignOut() {
+    if (signingOut) return;
+    signingOut = true;
+    try {
+      await auth.signOut();
+    } finally {
+      signingOut = false;
+    }
+  }
 
   function readPassedProfileIds(userId: string) {
     if (!browser) {
@@ -95,7 +116,7 @@
       const profilesPromise = supabase
         .from('profiles')
         .select(
-          'id, username, display_name, avatar_url, bio, location, interests, relationship_intent, last_active_at, is_active, onboarding_completed_at, age_confirmed, consent_acknowledged'
+          'id, username, display_name, avatar_url, bio, location, interests, relationship_intent, last_active_at, is_active, onboarding_completed_at, age_confirmed, consent_acknowledged, is_verified'
         )
         .eq('is_active', true)
         .eq('age_confirmed', true)
@@ -218,17 +239,23 @@
           ? `Has bloqueado a ${profile.display_name || profile.username}.`
           : savedMatch.is_mutual
             ? `¡Es un match! Tú y ${profile.display_name || profile.username} os gustáis.`
-            : `Te ha gustado el perfil de ${profile.display_name || profile.username}.`;
+            : action === 'super-like'
+              ? `¡Le enviaste un super-like a ${profile.display_name || profile.username}! Va a destacar entre sus likes.`
+              : `Te ha gustado el perfil de ${profile.display_name || profile.username}.`;
 
       removeProfileFromLists(profile.id);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error performing ${action} on discover profile:`, error);
+
+      const isSubscriptionGateError = action === 'super-like' && error?.code === '42501';
+
       actionErrorByProfile = {
         ...actionErrorByProfile,
-        [profile.id]:
-          action === 'block'
+        [profile.id]: isSubscriptionGateError
+          ? 'Los super-likes son una función de Atrevidos Premium. Suscribite para enviarlos sin límite.'
+          : action === 'block'
             ? 'No pudimos bloquear este perfil. Inténtalo de nuevo.'
-            : action === 'like'
+            : action === 'like' || action === 'super-like'
               ? 'No pudimos guardar tu like. Inténtalo de nuevo.'
               : 'No pudimos procesar esta acción. Inténtalo de nuevo.'
       };
@@ -264,6 +291,7 @@
     if ($auth.user?.id && $auth.user.id !== activeUserId) {
       activeUserId = $auth.user.id;
       void loadDiscoverProfiles();
+      void loadSubscriptionStatus($auth.user.id);
     }
 
     if (!$auth.user) {
@@ -282,53 +310,38 @@
       actionSuccessMessage = '';
       reportModalOpen = false;
       reportTarget = null;
+      subscription = null;
     }
   }
 
   $: visibleCount = filteredProfiles.length;
 </script>
 
-<div class="min-h-screen bg-gray-50 px-4 py-6 dark:bg-gray-900">
+<AppShell active="discover" onSignOut={handleSignOut} {signingOut}>
+<div class="min-h-screen bg-gray-50 px-4 py-6 dark:bg-dark-900">
   <div class="mx-auto max-w-6xl space-y-6">
     <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <a
-          href="/"
-          class="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-        >
-          <span aria-hidden="true">←</span>
-          Volver al feed
-        </a>
-        <h1 class="mt-3 text-3xl font-bold text-gray-900 dark:text-white">Descubrir personas</h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Descubrir personas</h1>
         <p class="mt-2 max-w-2xl text-sm text-gray-600 dark:text-gray-400">
           Explora perfiles activos y encuentra personas cerca de ti o con intereses similares.
         </p>
       </div>
 
       <div class="flex items-center gap-3">
-        <a
-          href="/matches"
-          class="inline-flex items-center justify-center rounded-xl border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
-        >
-          Matches
-        </a>
-        <a
-          href="/messages"
-          class="inline-flex items-center justify-center rounded-xl border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
-        >
-          Mensajes
-        </a>
-        <a
-          href="/profile"
-          class="inline-flex items-center justify-center rounded-xl border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
-        >
-          Mi perfil
-        </a>
+        {#if !hasActiveSubscription}
+          <a
+            href="/subscription"
+            class="inline-flex items-center gap-1 rounded-xl bg-gradient-to-r from-primary-500 to-fuchsia-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:brightness-110"
+          >
+            Hacete Premium
+          </a>
+        {/if}
         <button
           type="button"
           on:click={loadDiscoverProfiles}
           disabled={loading}
-          class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+          class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {#if loading}Actualizando…{:else}Actualizar{/if}
         </button>
@@ -452,6 +465,7 @@
             actionLoading={actionLoadingByProfile[profile.id] ?? false}
             activeAction={activeActionByProfile[profile.id] ?? null}
             actionError={actionErrorByProfile[profile.id] ?? ''}
+            {hasActiveSubscription}
             on:action={handleProfileAction}
             on:report={openProfileReport}
           />
@@ -460,6 +474,7 @@
     {/if}
   </div>
 </div>
+</AppShell>
 
 <ReportModal
   open={reportModalOpen}

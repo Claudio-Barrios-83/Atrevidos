@@ -28,6 +28,19 @@
   } from '$lib/onboarding';
   import LoadingState from '$lib/components/loading-state.svelte';
   import ErrorState from '$lib/components/error-state.svelte';
+  import AppShell from '$lib/components/app-shell.svelte';
+
+  let signingOut = false;
+
+  async function handleSignOut() {
+    if (signingOut) return;
+    signingOut = true;
+    try {
+      await auth.signOut();
+    } finally {
+      signingOut = false;
+    }
+  }
 
   const PROFILE_IMAGE_ACCEPT = PROFILE_IMAGE_MIME_TYPES.join(',');
 
@@ -332,17 +345,12 @@
   });
 </script>
 
-<div class="min-h-screen bg-gray-50 px-4 py-6 dark:bg-gray-900">
+<AppShell active="profile" onSignOut={handleSignOut} {signingOut}>
+<div class="min-h-screen bg-gray-50 px-4 py-6 dark:bg-dark-900">
   <div class="mx-auto max-w-2xl space-y-6">
     <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <div class="flex flex-wrap items-center gap-3 text-sm font-medium">
-          <a href="/" class="text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">Feed</a>
-          <a href="/discover" class="text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">Descubrir</a>
-          <a href="/matches" class="text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">Matches</a>
-          <a href="/messages" class="text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">Mensajes</a>
-        </div>
-        <h1 class="mt-3 text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
           {editing ? 'Editar perfil' : 'Mi perfil'}
         </h1>
       </div>
@@ -694,3 +702,4 @@
     {/if}
   </div>
 </div>
+</AppShell>

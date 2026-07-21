@@ -16,6 +16,7 @@ export type DiscoverProfile = Pick<
   | 'onboarding_completed_at'
   | 'age_confirmed'
   | 'consent_acknowledged'
+  | 'is_verified'
 >;
 
 export type DiscoverFilters = {
@@ -41,7 +42,7 @@ export type DiscoverMatchRow = Pick<
 
 export type DiscoverPersistedMatchType = Extract<
   Database['public']['Tables']['matches']['Row']['match_type'],
-  'like' | 'block'
+  'like' | 'block' | 'super-like'
 >;
 
 export const DISCOVER_PASSED_PROFILES_STORAGE_KEY_PREFIX = 'discover:passed:';

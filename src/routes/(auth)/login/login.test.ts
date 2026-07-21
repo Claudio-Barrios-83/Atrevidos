@@ -7,7 +7,7 @@ describe('Login Page', () => {
   it('renders login form by default', () => {
     render(Login);
     expect(screen.getAllByText('Iniciar sesión').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByRole('heading', { name: 'Iniciar sesión' })).toBeDefined();
+    expect(screen.getByRole('heading', { name: 'Bienvenida/o de nuevo' })).toBeDefined();
     expect(screen.queryByPlaceholderText('Nombre de usuario')).toBeNull();
   });
 
@@ -15,7 +15,7 @@ describe('Login Page', () => {
     render(Login);
     const toggleButton = screen.getByText('¿No tienes cuenta? Regístrate');
     await fireEvent.click(toggleButton);
-    expect(screen.getByText('Registro')).toBeDefined();
+    expect(screen.getByRole('heading', { name: 'Crear tu cuenta' })).toBeDefined();
     expect(screen.getByPlaceholderText('Nombre de usuario')).toBeDefined();
   });
 });

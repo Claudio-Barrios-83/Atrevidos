@@ -14,6 +14,7 @@
   } from '$lib/direct-conversation-recovery';
   import { supabase } from '$lib/supabase/client';
   import { resolveStorageImageUrl } from '$lib/supabase/profile-media';
+  import AppShell from '$lib/components/app-shell.svelte';
 
   const USER_CONVERSATIONS_VIEW = 'user_conversations' as never;
   const CONVERSATION_PARTICIPANTS_TABLE = 'conversation_participants' as never;
@@ -25,6 +26,17 @@
   let loading = false;
   let loadError = '';
   let conversations: ConversationListItem[] = [];
+  let signingOut = false;
+
+  async function handleSignOut() {
+    if (signingOut) return;
+    signingOut = true;
+    try {
+      await auth.signOut();
+    } finally {
+      signingOut = false;
+    }
+  }
 
   function formatLastActivity(value: string | null) {
     if (!value) {
@@ -219,38 +231,12 @@
   }
 </script>
 
-<div class="min-h-screen bg-gray-50 px-4 py-6 dark:bg-gray-900">
+<AppShell active="messages" onSignOut={handleSignOut} {signingOut}>
+<div class="min-h-screen bg-gray-50 px-4 py-6 dark:bg-dark-900">
   <div class="mx-auto max-w-5xl space-y-6">
     <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <div class="flex flex-wrap items-center gap-3 text-sm font-medium">
-          <a
-            href="/"
-            class="text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-          >
-            Feed
-          </a>
-          <a
-            href="/discover"
-            class="text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-          >
-            Descubrir
-          </a>
-          <a
-            href="/matches"
-            class="text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-          >
-            Matches
-          </a>
-          <a
-            href="/profile"
-            class="text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-          >
-            Mi perfil
-          </a>
-        </div>
-
-        <h1 class="mt-3 text-3xl font-bold text-gray-900 dark:text-white">Mensajes</h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Mensajes</h1>
         <p class="mt-2 max-w-3xl text-sm text-gray-600 dark:text-gray-400">
           Esta bandeja solo muestra conversaciones directas con matches mutuos. Los bloqueos y conversaciones fuera de
           match quedan ocultos para mantener la privacidad.
@@ -261,7 +247,7 @@
         type="button"
         on:click={loadConversations}
         disabled={loading}
-        class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+        class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {#if loading}Actualizando…{:else}Actualizar{/if}
       </button>
@@ -316,7 +302,7 @@
                       @{conversation.counterpartUsername}
                     </span>
                     {#if conversation.unreadCount > 0}
-                      <span class="inline-flex items-center rounded-full bg-indigo-600 px-2.5 py-1 text-xs font-semibold text-white">
+                      <span class="inline-flex items-center rounded-full bg-primary-600 px-2.5 py-1 text-xs font-semibold text-white">
                         {conversation.unreadCount} nuevo{conversation.unreadCount === 1 ? '' : 's'}
                       </span>
                     {/if}
@@ -347,3 +333,4 @@
     {/if}
   </div>
 </div>
+</AppShell>

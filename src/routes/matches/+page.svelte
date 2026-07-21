@@ -19,6 +19,8 @@
     type MutualMatchRow
   } from '$lib/matches';
   import { saveDiscoverMatch } from '$lib/discover-actions';
+  import AppShell from '$lib/components/app-shell.svelte';
+  import { isSubscriptionActive, type SubscriptionRow } from '$lib/subscription';
 
   const CONVERSATION_PARTICIPANTS_TABLE = 'conversation_participants' as never;
   const CONVERSATIONS_TABLE = 'conversations' as never;
@@ -31,6 +33,14 @@
     conversationId: string | null;
   };
 
+  type IncomingLike = {
+    id: string;
+    displayName: string;
+    username: string;
+    avatarUrl: string | null;
+    matchType: string;
+  };
+
   let activeUserId: string | null = null;
   let latestRequest = 0;
   let loading = false;
@@ -39,6 +49,71 @@
   let blockFeedback = '';
   let blockLoadingByUser: Record<string, boolean> = {};
   let locallyBlockedMatchUserIds = new Set<string>();
+  let subscription: SubscriptionRow | null = null;
+  let incomingLikes: IncomingLike[] = [];
+  let signingOut = false;
+
+  $: hasActiveSubscription = isSubscriptionActive(subscription);
+
+  async function loadSubscriptionStatus(userId: string) {
+    const { data } = await supabase.from('subscriptions').select('*').eq('user_id', userId).maybeSingle();
+    subscription = (data as SubscriptionRow | null) ?? null;
+  }
+
+  async function loadIncomingLikes(userId: string) {
+    // Gracias a la policy matches_select_own, esta consulta solo devuelve
+    // filas si el usuario tiene suscripcion activa (o si ya es match mutuo,
+    // que se filtra explicitamente aqui porque esos ya se muestran arriba).
+    const { data, error } = await supabase
+      .from('matches')
+      .select(
+        `
+          id,
+          match_type,
+          is_mutual,
+          profile:profiles!matches_user_id_fkey ( id, username, display_name, avatar_url )
+        `
+      )
+      .eq('target_user_id', userId)
+      .eq('is_mutual', false)
+      .in('match_type', ['like', 'super-like']);
+
+    if (error) {
+      console.error('Error loading incoming likes:', error);
+      incomingLikes = [];
+      return;
+    }
+
+    const rows = (data ?? []) as unknown as Array<{
+      id: string;
+      match_type: string;
+      profile: { id: string; username: string; display_name: string | null; avatar_url: string | null } | null;
+    }>;
+
+    const resolved = await Promise.all(
+      rows
+        .filter((row) => row.profile)
+        .map(async (row) => ({
+          id: row.id,
+          matchType: row.match_type,
+          displayName: row.profile!.display_name || row.profile!.username,
+          username: row.profile!.username,
+          avatarUrl: await resolveStorageImageUrl(row.profile!.avatar_url)
+        }))
+    );
+
+    incomingLikes = resolved;
+  }
+
+  async function handleSignOut() {
+    if (signingOut) return;
+    signingOut = true;
+    try {
+      await auth.signOut();
+    } finally {
+      signingOut = false;
+    }
+  }
 
   function formatMatchedDate(value: string) {
     const date = new Date(value);
@@ -260,6 +335,8 @@
     if ($auth.user?.id && $auth.user.id !== activeUserId) {
       activeUserId = $auth.user.id;
       void loadMatches();
+      void loadSubscriptionStatus($auth.user.id);
+      void loadIncomingLikes($auth.user.id);
     }
 
     if (!$auth.user) {
@@ -271,42 +348,18 @@
       blockFeedback = '';
       blockLoadingByUser = {};
       locallyBlockedMatchUserIds = new Set();
+      subscription = null;
+      incomingLikes = [];
     }
   }
 </script>
 
-<div class="min-h-screen bg-gray-50 px-4 py-6 dark:bg-gray-900">
+<AppShell active="matches" onSignOut={handleSignOut} {signingOut}>
+<div class="min-h-screen bg-gray-50 px-4 py-6 dark:bg-dark-900">
   <div class="mx-auto max-w-6xl space-y-6">
     <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <div class="flex flex-wrap items-center gap-3 text-sm font-medium">
-          <a
-            href="/"
-            class="text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-          >
-            Feed
-          </a>
-          <a
-            href="/discover"
-            class="text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-          >
-            Descubrir
-          </a>
-          <a
-            href="/profile"
-            class="text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-          >
-            Mi perfil
-          </a>
-          <a
-            href="/messages"
-            class="text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-          >
-            Mensajes
-          </a>
-        </div>
-
-        <h1 class="mt-3 text-3xl font-bold text-gray-900 dark:text-white">Tus matches</h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Tus matches</h1>
         <p class="mt-2 max-w-3xl text-sm text-gray-600 dark:text-gray-400">
           Aquí aparecen los likes mutuos. Atrevidos intenta preparar el chat directo automáticamente para que puedas abrirlo
           desde aquí o desde tu bandeja cuando ya esté disponible.
@@ -317,11 +370,65 @@
         type="button"
         on:click={loadMatches}
         disabled={loading}
-        class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+        class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {#if loading}Actualizando…{:else}Actualizar{/if}
       </button>
     </header>
+
+    <section class="rounded-2xl bg-white p-5 shadow-lg dark:bg-dark-800">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">A quién le gustás</h2>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Personas que ya te dieron like o super-like, antes de que sea match mutuo.
+          </p>
+        </div>
+        {#if !hasActiveSubscription}
+          <a
+            href="/subscription"
+            class="inline-flex items-center gap-1 rounded-xl bg-gradient-to-r from-primary-500 to-fuchsia-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:brightness-110"
+          >
+            Ver con Premium
+          </a>
+        {/if}
+      </div>
+
+      {#if !hasActiveSubscription}
+        <div class="mt-4 flex items-center gap-3 rounded-xl bg-gray-50 px-4 py-4 dark:bg-dark-900">
+          <div class="flex -space-x-2">
+            {#each { length: 3 } as _, i}
+              <div class="h-10 w-10 rounded-full border-2 border-white bg-gray-300 blur-sm dark:border-dark-800 dark:bg-dark-600"></div>
+            {/each}
+          </div>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Suscribite a Atrevidos Premium para ver quién te dio like antes de que sea match.
+          </p>
+        </div>
+      {:else if incomingLikes.length === 0}
+        <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">Todavía nadie te dio like. ¡Completá tu perfil para destacar!</p>
+      {:else}
+        <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {#each incomingLikes as like (like.id)}
+            <div class="flex items-center gap-3 rounded-xl bg-gray-50 px-3 py-3 dark:bg-dark-900">
+              {#if like.avatarUrl}
+                <img src={like.avatarUrl} alt={like.displayName} class="h-10 w-10 rounded-full object-cover" />
+              {:else}
+                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 font-bold text-primary-700 dark:bg-primary-950/50 dark:text-primary-300">
+                  {(like.displayName.trim()[0] || 'U').toUpperCase()}
+                </div>
+              {/if}
+              <div class="min-w-0">
+                <p class="truncate text-sm font-semibold text-gray-900 dark:text-white">{like.displayName}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  {like.matchType === 'super-like' ? '⭐ Te dio un super-like' : 'Te dio like'}
+                </p>
+              </div>
+            </div>
+          {/each}
+        </div>
+      {/if}
+    </section>
 
     {#if blockFeedback}
       <section class="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700 shadow-sm dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-300">
@@ -441,3 +548,4 @@
     {/if}
   </div>
 </div>
+</AppShell>

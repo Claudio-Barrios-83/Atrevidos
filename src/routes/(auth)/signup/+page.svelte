@@ -45,24 +45,35 @@
   });
 </script>
 
-<form onsubmit={handleRegister} class="flex flex-col space-y-4 p-4">
-  <h1 class="text-2xl font-bold">Registro</h1>
-  <input bind:value={email} type="email" placeholder="Email" class="w-full p-2 border rounded" required />
-  <input bind:value={password} type="password" placeholder="Contraseña" class="w-full p-2 border rounded" required />
-  <input bind:value={username} type="text" placeholder="Nombre de usuario" class="w-full p-2 border rounded" required />
-  
-  <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center" disabled={loading}>
-    {#if loading}
-      <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-    {/if}
-    {loading ? 'Cargando...' : 'Registrarse'}
-  </button>
-  
-  {#if error}
-    <div class="p-3 bg-red-50 text-red-600 rounded-lg text-sm">{error}</div>
-  {/if}
-  
-  <a href="{base}/login" class="text-center text-sm text-blue-600 hover:underline">
-    ¿Ya tienes cuenta? Inicia sesión
-  </a>
-</form>
+<div class="flex min-h-screen items-center justify-center bg-gradient-to-br from-dark-900 via-dark-900 to-primary-900 px-4 py-12">
+  <div class="w-full max-w-md">
+    <a href="/welcome" class="mb-8 flex items-center justify-center gap-2">
+      <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 text-xl font-bold text-white">A</span>
+      <span class="text-2xl font-extrabold tracking-tight text-white">Atrevidos</span>
+    </a>
+
+    <form onsubmit={handleRegister} class="flex flex-col space-y-4 rounded-3xl bg-white p-8 shadow-2xl dark:bg-dark-800">
+      <h1 class="text-center text-2xl font-bold text-gray-900 dark:text-white">Crear tu cuenta</h1>
+      <p class="text-center text-sm text-gray-500 dark:text-gray-400">Solo para personas mayores de 18 años</p>
+
+      <input bind:value={email} type="email" placeholder="Email" class="w-full rounded-xl border border-gray-300 p-3 text-sm outline-none focus:ring-2 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-900 dark:text-white" required />
+      <input bind:value={password} type="password" placeholder="Contraseña" class="w-full rounded-xl border border-gray-300 p-3 text-sm outline-none focus:ring-2 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-900 dark:text-white" required />
+      <input bind:value={username} type="text" placeholder="Nombre de usuario" class="w-full rounded-xl border border-gray-300 p-3 text-sm outline-none focus:ring-2 focus:ring-primary-500 dark:border-dark-600 dark:bg-dark-900 dark:text-white" required />
+
+      <button type="submit" class="flex h-11 w-full items-center justify-center rounded-xl bg-gradient-to-r from-primary-500 to-primary-700 font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50" disabled={loading}>
+        {#if loading}
+          <div class="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
+        {/if}
+        {loading ? 'Cargando...' : 'Registrarse'}
+      </button>
+
+      {#if error}
+        <div class="rounded-xl bg-red-50 p-3 text-sm text-red-600 dark:bg-red-950/30 dark:text-red-300">{error}</div>
+      {/if}
+
+      <a href="{base}/login" class="text-center text-sm font-medium text-primary-600 hover:underline dark:text-primary-400">
+        ¿Ya tienes cuenta? Inicia sesión
+      </a>
+    </form>
+  </div>
+</div>

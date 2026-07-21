@@ -14,7 +14,10 @@ const decide = ({
 describe('decideAuthRedirect', () => {
   it('redirects anonymous users on protected routes to /login', () => {
     expect(decide({ pathname: '/feed', isAuthenticated: false })).toBe('/login');
-    expect(decide({ pathname: '/', isAuthenticated: false })).toBe('/login');
+  });
+
+  it('redirects anonymous users on the root route to the public landing page', () => {
+    expect(decide({ pathname: '/', isAuthenticated: false })).toBe('/welcome');
   });
 
   it('allows anonymous users to stay on /login', () => {
@@ -23,6 +26,15 @@ describe('decideAuthRedirect', () => {
 
   it('allows anonymous users to stay on /signup', () => {
     expect(decide({ pathname: '/signup', isAuthenticated: false })).toBeNull();
+  });
+
+  it('allows anonymous users to stay on the public landing page /welcome', () => {
+    expect(decide({ pathname: '/welcome', isAuthenticated: false })).toBeNull();
+  });
+
+  it('redirects authenticated users away from /welcome to the app', () => {
+    expect(decide({ pathname: '/welcome', isAuthenticated: true, onboardingStatus: 'complete' })).toBe('/');
+    expect(decide({ pathname: '/welcome', isAuthenticated: true, onboardingStatus: 'incomplete' })).toBe('/onboarding');
   });
 
   it('allows anonymous users to open the legal notice pages', () => {

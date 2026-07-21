@@ -51,6 +51,9 @@
   import type { ReportTarget } from '$lib/reports';
   import LoadingState from '$lib/components/loading-state.svelte';
   import ErrorState from '$lib/components/error-state.svelte';
+  import AppShell from '$lib/components/app-shell.svelte';
+
+  type FeedTab = 'todos' | 'mias';
 
   type SelectedPostImage = {
     id: string;
@@ -82,9 +85,13 @@
   let reportFeedback = '';
   let blockingUserIds: Record<string, boolean> = {};
   let localBlockedUserIds = new Set<string>();
+  let activeTab: FeedTab = 'todos';
+  let postAnonymous = false;
+  let postVisibility: 'public' | 'followers' = 'public';
 
   $: selectedPostImageCount = selectedPostImages.length;
   $: remainingPostImageSlots = getRemainingPostImageSlots(selectedPostImageCount);
+  $: visiblePosts = activeTab === 'mias' ? posts.filter((post) => post.user_id === $auth.user?.id) : posts;
 
 
   function buildPostImageUploadId(index: number) {
@@ -604,8 +611,8 @@
         user_id: user.id,
         content,
         image_urls: normalizePostImageRefs(uploadedImageRefs),
-        visibility: 'public',
-        is_anonymous: false,
+        visibility: postVisibility,
+        is_anonymous: postAnonymous,
         is_archived: false
       } satisfies Database['public']['Tables']['posts']['Insert'];
 
@@ -616,6 +623,8 @@
       }
 
       newPostContent = '';
+      postAnonymous = false;
+      postVisibility = 'public';
       clearSelectedPostImages();
       composeSuccess = 'Publicación creada correctamente.';
       await loadPosts();
@@ -819,54 +828,33 @@
   });
 </script>
 
+<AppShell active="feed" onSignOut={handleSignOut} {signingOut}>
 <div class="mx-auto max-w-2xl px-4 py-8">
-  <header class="mb-8 flex items-center justify-between gap-4">
-    <div>
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Atrevidos</h1>
-      {#if $auth.user?.email}
-        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Sesión activa como {$auth.user.email}</p>
-      {/if}
-    </div>
-
-    <div class="flex items-center gap-3">
-      <a
-        href="/discover"
-        class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
-      >
-        Descubrir
-      </a>
-
-      <a
-        href="/matches"
-        class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
-      >
-        Matches
-      </a>
-
-      <a
-        href="/messages"
-        class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
-      >
-        Mensajes
-      </a>
-
-      <a
-        href="/profile"
-        class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
-      >
-        Mi perfil
-      </a>
-
-      <button
-        type="button"
-        on:click={handleSignOut}
-        disabled={signingOut}
-        class="text-sm text-gray-600 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:text-white"
-      >
-        {#if signingOut}Cerrando...{:else}Cerrar sesión{/if}
-      </button>
-    </div>
+  <header class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Tu feed</h1>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Lo que comparte la comunidad de Atrevidos, en tiempo real.</p>
   </header>
+
+  <div class="mb-6 flex gap-1 rounded-xl bg-gray-100 p-1 dark:bg-dark-800">
+    <button
+      type="button"
+      on:click={() => (activeTab = 'todos')}
+      class={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+        activeTab === 'todos' ? 'bg-white text-primary-700 shadow dark:bg-dark-700 dark:text-primary-300' : 'text-gray-500 dark:text-gray-400'
+      }`}
+    >
+      Todos
+    </button>
+    <button
+      type="button"
+      on:click={() => (activeTab = 'mias')}
+      class={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+        activeTab === 'mias' ? 'bg-white text-primary-700 shadow dark:bg-dark-700 dark:text-primary-300' : 'text-gray-500 dark:text-gray-400'
+      }`}
+    >
+      Mis publicaciones
+    </button>
+  </div>
 
   {#if sessionError}
     <p class="mb-6 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">
@@ -897,6 +885,30 @@
       disabled={publishing}
       maxlength="500"
     ></textarea>
+
+    <div class="mt-3 flex flex-wrap items-center gap-4">
+      <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+        <input
+          type="checkbox"
+          bind:checked={postAnonymous}
+          disabled={publishing}
+          class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600"
+        />
+        Publicar de forma anónima
+      </label>
+
+      <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+        <span>Visible para:</span>
+        <select
+          bind:value={postVisibility}
+          disabled={publishing}
+          class="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm text-gray-800 outline-none focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
+        >
+          <option value="public">Todo el mundo</option>
+          <option value="followers">Solo mis conexiones (matches)</option>
+        </select>
+      </label>
+    </div>
 
     <div class="mt-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -988,13 +1000,19 @@
     <LoadingState message="Cargando publicaciones..." />
   {:else if feedError}
     <ErrorState message={feedError} retry={loadPosts} />
-  {:else if posts.length === 0}
+  {:else if visiblePosts.length === 0}
     <div class="rounded-xl bg-gray-50 py-12 text-center dark:bg-gray-800">
-      <p class="text-gray-500 dark:text-gray-400">Aún no hay publicaciones públicas. ¡Sé la primera persona en compartir algo!</p>
+      <p class="text-gray-500 dark:text-gray-400">
+        {#if activeTab === 'mias'}
+          Todavía no publicaste nada. ¡Compartí algo desde el cuadro de arriba!
+        {:else}
+          Aún no hay publicaciones públicas. ¡Sé la primera persona en compartir algo!
+        {/if}
+      </p>
     </div>
   {:else}
     <div class="space-y-4">
-      {#each posts as post (post.id)}
+      {#each visiblePosts as post (post.id)}
         <article class="rounded-xl bg-white p-6 shadow dark:bg-gray-800">
           <div class="flex items-start space-x-3">
             <div class="flex-shrink-0">
@@ -1163,6 +1181,7 @@
     </div>
   {/if}
 </div>
+</AppShell>
 
 <ReportModal
   open={reportModalOpen}

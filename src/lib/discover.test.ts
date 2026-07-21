@@ -33,6 +33,7 @@ const baseProfile = (overrides: Partial<DiscoverProfile>): DiscoverProfile => ({
   onboarding_completed_at: '2026-06-01T10:00:00.000Z',
   age_confirmed: true,
   consent_acknowledged: true,
+  is_verified: false,
   ...overrides
 });
 

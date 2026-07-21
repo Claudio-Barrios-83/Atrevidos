@@ -20,7 +20,6 @@
 
   const USER_CONVERSATIONS_VIEW = 'user_conversations' as never;
   const CONVERSATION_PARTICIPANTS_TABLE = 'conversation_participants' as never;
-  const CONVERSATIONS_TABLE = 'conversations' as never;
   const MATCHES_TABLE = 'matches' as never;
   const PROFILES_TABLE = 'profiles' as never;
 
@@ -362,31 +361,20 @@
     createGroupError = '';
 
     try {
-      const { data: conversation, error: conversationError } = await supabase
-        .from(CONVERSATIONS_TABLE)
-        .insert({ is_group: true, name: trimmedName, created_by: user.id } as never)
-        .select('id')
-        .single();
+      // Se crea vía RPC (SECURITY DEFINER) en vez de insertar directo: la
+      // política RLS de "conversations" exige ya ser participante activo del
+      // grupo para poder leer la fila insertada (RETURNING), pero ese
+      // participante todavía no existe en ese punto. La función atómica
+      // evita ese problema de orden y valida server-side que los miembros
+      // sean matches mutuos.
+      const { data: conversationId, error: rpcError } = await supabase.rpc('create_group_conversation' as never, {
+        creator_id: user.id,
+        group_name: trimmedName,
+        member_ids: Array.from(selectedGroupMemberIds)
+      } as never);
 
-      if (conversationError) throw conversationError;
-
-      const conversationId = (conversation as { id: string }).id;
-
-      const { error: selfParticipantError } = await supabase
-        .from(CONVERSATION_PARTICIPANTS_TABLE)
-        .insert({ conversation_id: conversationId, user_id: user.id, role: 'admin' } as never);
-
-      if (selfParticipantError) throw selfParticipantError;
-
-      const memberRows = Array.from(selectedGroupMemberIds).map((memberId) => ({
-        conversation_id: conversationId,
-        user_id: memberId,
-        role: 'member'
-      }));
-
-      const { error: memberError } = await supabase.from(CONVERSATION_PARTICIPANTS_TABLE).insert(memberRows as never);
-
-      if (memberError) throw memberError;
+      if (rpcError) throw rpcError;
+      if (!conversationId) throw new Error('No se pudo crear el grupo.');
 
       showCreateGroupForm = false;
       window.location.href = `/messages/group/${conversationId}`;

@@ -1,4 +1,9 @@
 <script lang="ts">
+  // Hoja de estilos global de Tailwind. Sin este import, PostCSS/Tailwind
+  // nunca procesa nada y el build no genera NINGÚN CSS: toda la app se ve
+  // sin estilos en producción (clases utilitarias presentes en el markup
+  // pero sin reglas CSS que las respalden).
+  import '../app.css';
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';

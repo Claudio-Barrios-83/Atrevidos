@@ -880,7 +880,7 @@
       id="new-post"
       bind:value={newPostContent}
       placeholder="¿Qué estás pensando?"
-      class="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 p-3 text-gray-900 outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+      class="w-full resize-none rounded-lg border border-gray-200 bg-gray-50 p-3 text-gray-900 outline-none focus:ring-2 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
       rows="3"
       disabled={publishing}
       maxlength="500"
@@ -972,7 +972,7 @@
         type="button"
         on:click={createPost}
         disabled={publishing || (!newPostContent.trim() && selectedPostImages.length === 0)}
-        class="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+        class="flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {#if publishing}
           <div class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
@@ -1023,7 +1023,7 @@
                   class="h-10 w-10 rounded-full object-cover"
                 />
               {:else}
-                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 font-bold text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300">
+                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 font-bold text-primary-600 dark:bg-primary-900 dark:text-primary-300">
                   {post.profile?.display_name?.[0] || post.profile?.username?.[0] || 'U'}
                 </div>
               {/if}
@@ -1113,7 +1113,7 @@
                       maxlength="500"
                       placeholder="Escribe un comentario..."
                       disabled={post.comment_state.submitPending}
-                      class="w-full resize-none rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-70 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                      class="w-full resize-none rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-70 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                     ></textarea>
                     <div class="flex items-center justify-between gap-3">
                       <p class="text-xs text-gray-500 dark:text-gray-400">
@@ -1123,7 +1123,7 @@
                         type="button"
                         on:click={() => createComment(post.id)}
                         disabled={post.comment_state.submitPending || !post.comment_state.composerValue.trim()}
-                        class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        class="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         {#if post.comment_state.submitPending}Enviando...{:else}Comentar{/if}
                       </button>

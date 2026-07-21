@@ -438,7 +438,7 @@
 
     {#if loading}
       <section class="rounded-2xl bg-white px-6 py-12 text-center shadow-lg dark:bg-gray-800">
-        <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
+        <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
         <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Buscando matches mutuos…</p>
       </section>
     {:else if loadError}
@@ -453,7 +453,7 @@
         </p>
         <a
           href="/discover"
-          class="mt-6 inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          class="mt-6 inline-flex items-center justify-center rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-700"
         >
           Seguir descubriendo
         </a>
@@ -462,7 +462,7 @@
       <section class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         {#each matches as match (match.id)}
           <article class="overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
-            <div class="h-24 bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-rose-500"></div>
+            <div class="h-24 bg-gradient-to-r from-primary-500 via-fuchsia-500 to-rose-500"></div>
 
             <div class="px-5 pb-5">
               <div class="-mt-10 flex items-end justify-between gap-3">
@@ -473,7 +473,7 @@
                     class="h-20 w-20 rounded-2xl border-4 border-white object-cover shadow-md dark:border-gray-800"
                   />
                 {:else}
-                  <div class="flex h-20 w-20 items-center justify-center rounded-2xl border-4 border-white bg-indigo-100 text-2xl font-bold text-indigo-600 shadow-md dark:border-gray-800 dark:bg-indigo-900 dark:text-indigo-300">
+                  <div class="flex h-20 w-20 items-center justify-center rounded-2xl border-4 border-white bg-primary-100 text-2xl font-bold text-primary-600 shadow-md dark:border-gray-800 dark:bg-primary-900 dark:text-primary-300">
                     {(match.displayName.trim()[0] || 'U').toUpperCase()}
                   </div>
                 {/if}
@@ -496,7 +496,7 @@
                 </div>
 
                 <div class="flex flex-wrap gap-2">
-                  <span class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-200">
+                  <span class="inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700 dark:bg-primary-950/50 dark:text-primary-200">
                     {match.relationshipIntent
                       ? relationshipIntentLabels.get(match.relationshipIntent) ?? 'Sin definir'
                       : 'Sin definir'}
@@ -509,7 +509,7 @@
                   {/each}
                 </div>
 
-                <div class={`rounded-2xl px-4 py-4 text-sm ${match.hasConversation ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200' : 'bg-indigo-50 text-indigo-800 dark:bg-indigo-950/30 dark:text-indigo-200'}`}>
+                <div class={`rounded-2xl px-4 py-4 text-sm ${match.hasConversation ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200' : 'bg-primary-50 text-primary-800 dark:bg-primary-950/30 dark:text-primary-200'}`}>
                   {#if match.hasConversation}
                     <p class="font-semibold">Chat listo para abrir.</p>
                     <p class="mt-1">
@@ -526,7 +526,7 @@
                 <div class="grid gap-3 sm:grid-cols-2">
                   <a
                     href={match.conversationId ? `/messages/${match.conversationId}` : '/messages'}
-                    class="inline-flex w-full items-center justify-center rounded-xl border border-indigo-300 px-4 py-3 text-sm font-semibold text-indigo-700 transition hover:bg-indigo-50 dark:border-indigo-700 dark:text-indigo-300 dark:hover:bg-indigo-950/30"
+                    class="inline-flex w-full items-center justify-center rounded-xl border border-primary-300 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-50 dark:border-primary-700 dark:text-primary-300 dark:hover:bg-primary-950/30"
                   >
                     {match.hasConversation ? 'Abrir chat' : 'Ir a mensajes'}
                   </a>

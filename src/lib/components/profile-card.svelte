@@ -41,7 +41,7 @@
 </script>
 
 <article class="overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
-  <div class="h-24 bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-rose-500"></div>
+  <div class="h-24 bg-gradient-to-r from-primary-500 via-fuchsia-500 to-rose-500"></div>
 
   <div class="px-4 pb-5">
     <div class="-mt-10 flex items-end justify-between gap-3">
@@ -52,7 +52,7 @@
           class="h-20 w-20 rounded-2xl border-4 border-white object-cover shadow-md dark:border-gray-800"
         />
       {:else}
-        <div class="flex h-20 w-20 items-center justify-center rounded-2xl border-4 border-white bg-indigo-100 text-2xl font-bold text-indigo-600 shadow-md dark:border-gray-800 dark:bg-indigo-900 dark:text-indigo-300">
+        <div class="flex h-20 w-20 items-center justify-center rounded-2xl border-4 border-white bg-primary-100 text-2xl font-bold text-primary-600 shadow-md dark:border-gray-800 dark:bg-primary-900 dark:text-primary-300">
           {profileInitial}
         </div>
       {/if}
@@ -97,7 +97,7 @@
       </p>
 
       <div class="flex flex-wrap gap-2">
-        <span class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-200">
+        <span class="inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700 dark:bg-primary-950/50 dark:text-primary-200">
           {intentLabel}
         </span>
 

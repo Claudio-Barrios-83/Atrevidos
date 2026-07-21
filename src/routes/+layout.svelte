@@ -105,7 +105,7 @@
 {#if shouldShowShellLoader}
   <div class="flex min-h-screen items-center justify-center bg-gray-50 px-4 text-center text-gray-600 dark:bg-gray-900 dark:text-gray-300">
     <div>
-      <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
+      <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
       <p class="mt-4 text-sm font-medium">Preparando tu sesión…</p>
     </div>
   </div>

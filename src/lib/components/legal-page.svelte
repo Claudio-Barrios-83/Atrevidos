@@ -11,7 +11,7 @@
 
 <main class="min-h-screen bg-gray-50 px-4 py-8 dark:bg-gray-900">
   <div class="mx-auto max-w-3xl rounded-3xl bg-white p-6 shadow-lg dark:bg-gray-800 sm:p-8">
-    <p class="text-sm font-medium uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-400">{page.eyebrow}</p>
+    <p class="text-sm font-medium uppercase tracking-[0.2em] text-primary-600 dark:text-primary-400">{page.eyebrow}</p>
     <h1 class="mt-3 text-3xl font-bold text-gray-900 dark:text-white">{page.title}</h1>
     <p class="mt-4 text-sm leading-6 text-gray-600 dark:text-gray-300">{page.summary}</p>
 

@@ -130,21 +130,21 @@
 {#if !authState.initialized || loading}
   <div class="flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-gray-900">
     <div class="text-center">
-      <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
+      <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
       <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Preparando tu onboarding…</p>
     </div>
   </div>
 {:else if !authState.user}
   <div class="flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-gray-900">
     <div class="text-center">
-      <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
+      <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
       <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Redirigiendo al acceso…</p>
     </div>
   </div>
 {:else if loadFailed}
   <div class="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-6 dark:bg-gray-900">
     <div class="w-full max-w-lg rounded-2xl bg-white p-6 text-center shadow-lg dark:bg-gray-800">
-      <p class="text-sm font-medium uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-400">Onboarding</p>
+      <p class="text-sm font-medium uppercase tracking-[0.2em] text-primary-600 dark:text-primary-400">Onboarding</p>
       <h1 class="mt-3 text-2xl font-bold text-gray-900 dark:text-white">No pudimos cargar tu perfil inicial</h1>
       <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
         Puede haber sido un fallo temporal al consultar tu perfil. Reinténtalo para continuar.
@@ -159,7 +159,7 @@
       <button
         type="button"
         on:click={retryLoad}
-        class="mt-6 inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
+        class="mt-6 inline-flex items-center justify-center rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-700"
       >
         Reintentar carga
       </button>
@@ -169,7 +169,7 @@
   <div class="min-h-screen bg-gray-50 px-4 py-6 dark:bg-gray-900">
     <div class="mx-auto max-w-2xl">
       <div class="mb-6 text-center">
-        <p class="text-sm font-medium uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-400">Primer acceso</p>
+        <p class="text-sm font-medium uppercase tracking-[0.2em] text-primary-600 dark:text-primary-400">Primer acceso</p>
         <h1 class="mt-3 text-3xl font-bold text-gray-900 dark:text-white">Completa tu perfil</h1>
         <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
           Antes de usar Atrevidos necesitamos algunos datos básicos para preparar tu perfil.
@@ -208,7 +208,7 @@
                   form.username = normalizeUsername(form.username);
                 }}
                 disabled={saving}
-                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
                 placeholder="tu_nombre"
               />
               <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Solo letras minúsculas, números y guion bajo.</p>
@@ -227,7 +227,7 @@
                 autocomplete="name"
                 bind:value={form.displayName}
                 disabled={saving}
-                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
                 placeholder="Cómo quieres que te vean"
               />
             </div>
@@ -244,7 +244,7 @@
                 maxlength="280"
                 bind:value={form.bio}
                 disabled={saving}
-                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
                 placeholder="Cuéntanos algo sobre ti, tu vibra o lo que te gusta conversar"
               ></textarea>
               <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{form.bio.trim().length}/280 caracteres</p>
@@ -263,7 +263,7 @@
                 autocomplete="address-level2"
                 bind:value={form.location}
                 disabled={saving}
-                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
                 placeholder="Ciudad, país"
               />
             </div>
@@ -279,7 +279,7 @@
                 required
                 bind:value={form.interests}
                 disabled={saving}
-                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
                 placeholder="música, viajes, café, senderismo"
               />
               <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Sepáralos con comas.</p>
@@ -295,7 +295,7 @@
                 required
                 bind:value={form.relationshipIntent}
                 disabled={saving}
-                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
               >
                 <option value="">Selecciona una opción</option>
                 {#each RELATIONSHIP_INTENT_OPTIONS as option}
@@ -323,7 +323,7 @@
                 maxlength="200"
                 bind:value={form.relationshipPreferences}
                 disabled={saving}
-                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
                 placeholder="Por ejemplo: me gustan las conversaciones tranquilas, planes al aire libre o gente creativa"
               ></textarea>
             </div>
@@ -335,7 +335,7 @@
                 type="checkbox"
                 bind:checked={form.ageConfirmed}
                 disabled={saving}
-                class="mt-1 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                class="mt-1 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
               />
               <span>Confirmo que soy mayor de 18 años.</span>
             </label>
@@ -345,7 +345,7 @@
                 type="checkbox"
                 bind:checked={form.consentAcknowledged}
                 disabled={saving}
-                class="mt-1 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                class="mt-1 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
               />
               <span>
                 Confirmo que usaré Atrevidos de forma respetuosa y con consentimiento claro en mis interacciones.
@@ -360,7 +360,7 @@
                   target="_blank"
                   rel="noreferrer"
                   aria-label={`${link.label} (se abre en una nueva pestaña)`}
-                  class="font-medium text-indigo-600 underline underline-offset-2 hover:text-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 dark:text-indigo-400"
+                  class="font-medium text-primary-600 underline underline-offset-2 hover:text-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 dark:text-primary-400"
                 >
                   {link.label.toLowerCase()}
                   <span class="sr-only"> (se abre en una nueva pestaña)</span>
@@ -372,7 +372,7 @@
           <button
             type="submit"
             disabled={saving}
-            class="flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+            class="flex w-full items-center justify-center rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {#if saving}
               <svg class="mr-2 h-5 w-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

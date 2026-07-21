@@ -255,7 +255,7 @@
 
     {#if loading}
       <section class="rounded-2xl bg-white px-6 py-12 text-center shadow-lg dark:bg-gray-800">
-        <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
+        <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
         <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Cargando conversaciones visibles…</p>
       </section>
     {:else if loadError}
@@ -270,7 +270,7 @@
         </p>
         <a
           href="/matches"
-          class="mt-6 inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          class="mt-6 inline-flex items-center justify-center rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-700"
         >
           Ver matches
         </a>
@@ -288,7 +288,7 @@
                     class="h-14 w-14 rounded-2xl object-cover shadow-sm"
                   />
                 {:else}
-                  <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100 text-lg font-bold text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300">
+                  <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-100 text-lg font-bold text-primary-600 dark:bg-primary-900 dark:text-primary-300">
                     {(conversation.counterpartName.trim()[0] || 'U').toUpperCase()}
                   </div>
                 {/if}
@@ -321,7 +321,7 @@
 
                 <a
                   href={`/messages/${conversation.conversationId}`}
-                  class="inline-flex items-center justify-center rounded-xl border border-indigo-300 px-4 py-3 text-sm font-semibold text-indigo-700 transition hover:bg-indigo-50 dark:border-indigo-700 dark:text-indigo-300 dark:hover:bg-indigo-950/30"
+                  class="inline-flex items-center justify-center rounded-xl border border-primary-300 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-50 dark:border-primary-700 dark:text-primary-300 dark:hover:bg-primary-950/30"
                 >
                   Abrir chat
                 </a>

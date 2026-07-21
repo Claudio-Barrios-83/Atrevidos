@@ -359,7 +359,7 @@
         <button
           type="button"
           on:click={startEditing}
-          class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-700"
         >
           Editar perfil
         </button>
@@ -405,7 +405,7 @@
               {:else if resolvedAvatarUrl}
                 <img src={resolvedAvatarUrl} alt="Avatar actual" class="h-28 w-28 rounded-2xl object-cover shadow-md" />
               {:else}
-                <div class="flex h-28 w-28 items-center justify-center rounded-2xl bg-indigo-100 text-3xl font-bold text-indigo-600 shadow-md dark:bg-indigo-900 dark:text-indigo-300">
+                <div class="flex h-28 w-28 items-center justify-center rounded-2xl bg-primary-100 text-3xl font-bold text-primary-600 shadow-md dark:bg-primary-900 dark:text-primary-300">
                   {(profile.display_name || profile.username || 'U').trim()[0].toUpperCase()}
                 </div>
               {/if}
@@ -426,7 +426,7 @@
             {#if resolvedAvatarUrl}
               <img src={resolvedAvatarUrl} alt="Avatar" class="h-28 w-28 rounded-2xl object-cover shadow-md" />
             {:else}
-              <div class="flex h-28 w-28 items-center justify-center rounded-2xl bg-indigo-100 text-3xl font-bold text-indigo-600 shadow-md dark:bg-indigo-900 dark:text-indigo-300">
+              <div class="flex h-28 w-28 items-center justify-center rounded-2xl bg-primary-100 text-3xl font-bold text-primary-600 shadow-md dark:bg-primary-900 dark:text-primary-300">
                 {(profile.display_name || profile.username || 'U').trim()[0].toUpperCase()}
               </div>
             {/if}
@@ -536,7 +536,7 @@
                   bind:value={form.username}
                   on:input={() => { form.username = normalizeUsername(form.username); }}
                   disabled={saving}
-                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
                   placeholder="tu_nombre"
                 />
               </div>
@@ -547,7 +547,7 @@
                   id="edit-displayName" type="text" required maxlength="80"
                   bind:value={form.displayName}
                   disabled={saving}
-                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
                   placeholder="Cómo quieres que te vean"
                 />
               </div>
@@ -558,7 +558,7 @@
                   id="edit-bio" required rows="4" maxlength="280"
                   bind:value={form.bio}
                   disabled={saving}
-                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
                   placeholder="Cuéntanos algo sobre ti"
                 ></textarea>
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{form.bio.trim().length}/280 caracteres</p>
@@ -570,7 +570,7 @@
                   id="edit-location" type="text" required maxlength="120"
                   bind:value={form.location}
                   disabled={saving}
-                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
                   placeholder="Ciudad, país"
                 />
               </div>
@@ -581,7 +581,7 @@
                   id="edit-interests" type="text" required
                   bind:value={form.interests}
                   disabled={saving}
-                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
                   placeholder="música, viajes, café"
                 />
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Sepáralos con comas.</p>
@@ -593,7 +593,7 @@
                   id="edit-relationshipIntent" required
                   bind:value={form.relationshipIntent}
                   disabled={saving}
-                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
                 >
                   <option value="">Selecciona una opción</option>
                   {#each RELATIONSHIP_INTENT_OPTIONS as option}
@@ -610,7 +610,7 @@
                   id="edit-relationshipPreferences" rows="3" maxlength="200"
                   bind:value={form.relationshipPreferences}
                   disabled={saving}
-                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
                   placeholder="Por ejemplo: me gustan las conversaciones tranquilas"
                 ></textarea>
               </div>
@@ -628,7 +628,7 @@
               <button
                 type="submit"
                 disabled={saving}
-                class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+                class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {#if saving}
                   <svg class="mr-2 h-5 w-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -697,7 +697,7 @@
       <div class="rounded-2xl bg-white px-6 py-12 text-center shadow-lg dark:bg-gray-800">
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Perfil no encontrado</h2>
         <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">No pudimos encontrar tu perfil. Intenta completar el onboarding primero.</p>
-        <a href="/onboarding" class="mt-6 inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700">Ir al onboarding</a>
+        <a href="/onboarding" class="mt-6 inline-flex items-center justify-center rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-700">Ir al onboarding</a>
       </div>
     {/if}
   </div>

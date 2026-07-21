@@ -515,13 +515,13 @@
         <div class="flex flex-wrap items-center gap-3 text-sm font-medium">
           <a
             href="/messages"
-            class="text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+            class="text-primary-600 transition hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
           >
             ← Volver a mensajes
           </a>
           <a
             href="/matches"
-            class="text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+            class="text-primary-600 transition hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
           >
             Matches
           </a>
@@ -536,7 +536,7 @@
                 class="h-16 w-16 rounded-2xl object-cover shadow-sm"
               />
             {:else}
-              <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-100 text-xl font-bold text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300">
+              <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-100 text-xl font-bold text-primary-600 dark:bg-primary-900 dark:text-primary-300">
                 {getInitials(conversation.counterpartName)}
               </div>
             {/if}
@@ -563,7 +563,7 @@
           type="button"
           on:click={loadConversation}
           disabled={loading}
-          class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+          class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {#if loading}Actualizando…{:else}Actualizar{/if}
         </button>
@@ -583,7 +583,7 @@
 
     {#if loading}
       <section class="rounded-3xl bg-white px-6 py-12 text-center shadow-lg dark:bg-gray-800">
-        <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
+        <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
         <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Cargando conversación…</p>
       </section>
     {:else if loadError}
@@ -614,10 +614,10 @@
             {#each messageItems as message (message.id)}
               <div class={`flex ${message.isOwnMessage ? 'justify-end' : 'justify-start'}`}>
                 <article
-                  class={`max-w-[85%] rounded-3xl px-4 py-3 shadow-sm ${message.isOwnMessage ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100'}`}
+                  class={`max-w-[85%] rounded-3xl px-4 py-3 shadow-sm ${message.isOwnMessage ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100'}`}
                 >
                   <div class="flex items-start justify-between gap-3">
-                    <p class={`text-xs font-semibold uppercase tracking-wide ${message.isOwnMessage ? 'text-indigo-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                    <p class={`text-xs font-semibold uppercase tracking-wide ${message.isOwnMessage ? 'text-primary-100' : 'text-gray-500 dark:text-gray-400'}`}>
                       {message.isOwnMessage ? 'Tú' : conversation.counterpartName}
                     </p>
 
@@ -627,7 +627,7 @@
                       disabled={message.isOwnMessage}
                       aria-label={message.isOwnMessage ? 'No puedes reportarte a ti misma/o.' : 'Reportar este mensaje'}
                       title={message.isOwnMessage ? 'No puedes reportarte a ti misma/o.' : 'Reportar este mensaje'}
-                      class={`shrink-0 text-xs font-semibold transition ${message.isOwnMessage ? 'cursor-not-allowed text-indigo-200/70 opacity-70' : 'text-rose-600 hover:text-rose-700 dark:text-rose-300 dark:hover:text-rose-200'}`}
+                      class={`shrink-0 text-xs font-semibold transition ${message.isOwnMessage ? 'cursor-not-allowed text-primary-200/70 opacity-70' : 'text-rose-600 hover:text-rose-700 dark:text-rose-300 dark:hover:text-rose-200'}`}
                     >
                       Reportar
                     </button>
@@ -635,7 +635,7 @@
                   <p class={`mt-2 whitespace-pre-wrap text-sm leading-6 ${message.isDeleted ? 'italic opacity-80' : ''}`}>
                     {message.content || 'Mensaje vacío'}
                   </p>
-                  <p class={`mt-3 text-[11px] ${message.isOwnMessage ? 'text-indigo-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                  <p class={`mt-3 text-[11px] ${message.isOwnMessage ? 'text-primary-100' : 'text-gray-500 dark:text-gray-400'}`}>
                     {formatTimestamp(message.createdAt)}
                   </p>
                 </article>
@@ -655,7 +655,7 @@
             rows="4"
             maxlength="2000"
             placeholder="Escribe algo bonito…"
-            class="mt-3 w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-indigo-400 dark:focus:ring-indigo-900"
+            class="mt-3 w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-200 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-primary-400 dark:focus:ring-primary-900"
           ></textarea>
 
           <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -672,7 +672,7 @@
             <button
               type="submit"
               disabled={sending || draft.trim().length === 0}
-              class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+              class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {#if sending}Enviando…{:else}Enviar{/if}
             </button>

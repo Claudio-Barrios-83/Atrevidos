@@ -364,7 +364,7 @@
         <button
           type="button"
           on:click={resetFilters}
-          class="text-sm font-medium text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+          class="text-sm font-medium text-primary-600 transition hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
         >
           Limpiar
         </button>
@@ -381,7 +381,7 @@
             bind:value={filters.location}
             on:input={applyFilters}
             placeholder="Ej. Madrid"
-            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
           />
         </div>
 
@@ -396,7 +396,7 @@
             bind:value={filters.interest}
             on:input={applyFilters}
             placeholder="Ej. café"
-            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
           />
           <datalist id="discover-interests">
             {#each interestOptions as interest}
@@ -413,7 +413,7 @@
             id="intent-filter"
             bind:value={filters.relationshipIntent}
             on:change={applyFilters}
-            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
           >
             <option value="">Todas</option>
             {#each RELATIONSHIP_INTENT_OPTIONS as option}
@@ -427,7 +427,7 @@
             type="checkbox"
             bind:checked={filters.onlineRecentlyOnly}
             on:change={applyFilters}
-            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+            class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
           />
           Solo en línea recientemente
         </label>
@@ -440,7 +440,7 @@
       </section>
     {:else if loading}
       <section class="rounded-2xl bg-white px-4 py-12 text-center shadow-lg dark:bg-gray-800">
-        <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
+        <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
         <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Buscando perfiles para ti…</p>
       </section>
     {:else if visibleCount === 0 && allProfiles.length > 0}

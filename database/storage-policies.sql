@@ -16,28 +16,32 @@
 -- POLÍTICAS PARA BUCKET: avatars
 -- ============================================================================
 
+-- IMPORTANTE: "TO authenticated" es obligatorio en todas las políticas de este
+-- archivo. Sin esa cláusula, Postgres asigna el rol PUBLIC por defecto (incluye
+-- "anon"), permitiendo descargar/subir archivos sin sesión.
+
 -- Usuarios pueden subir su propio avatar (carpeta = user_id)
 CREATE POLICY "Usuarios pueden subir su propio avatar" ON storage.objects
-FOR INSERT WITH CHECK (
+FOR INSERT TO authenticated WITH CHECK (
     bucket_id = 'avatars' 
     AND auth.uid()::text = (storage.foldername(name))[1]
 );
 
--- Usuarios pueden ver avatares públicos
+-- Usuarios autenticados pueden ver avatares
 CREATE POLICY "Usuarios pueden ver avatares" ON storage.objects
-FOR SELECT USING (
+FOR SELECT TO authenticated USING (
     bucket_id = 'avatars'
 );
 
 -- Usuarios pueden actualizar su propio avatar
 CREATE POLICY "Usuarios pueden actualizar su propio avatar" ON storage.objects
-FOR UPDATE
+FOR UPDATE TO authenticated
 USING (auth.uid()::text = (storage.foldername(name))[1])
 WITH CHECK (auth.uid()::text = (storage.foldername(name))[1]);
 
 -- Usuarios pueden eliminar su propio avatar
 CREATE POLICY "Usuarios pueden eliminar su propio avatar" ON storage.objects
-FOR DELETE
+FOR DELETE TO authenticated
 USING (auth.uid()::text = (storage.foldername(name))[1]);
 
 -- ============================================================================
@@ -45,21 +49,21 @@ USING (auth.uid()::text = (storage.foldername(name))[1]);
 -- ============================================================================
 
 CREATE POLICY "Usuarios pueden subir su propia portada" ON storage.objects
-FOR INSERT WITH CHECK (
+FOR INSERT TO authenticated WITH CHECK (
     bucket_id = 'covers' 
     AND auth.uid()::text = (storage.foldername(name))[1]
 );
 
 CREATE POLICY "Usuarios pueden ver portadas" ON storage.objects
-FOR SELECT USING (bucket_id = 'covers');
+FOR SELECT TO authenticated USING (bucket_id = 'covers');
 
 CREATE POLICY "Usuarios pueden actualizar su propia portada" ON storage.objects
-FOR UPDATE
+FOR UPDATE TO authenticated
 USING (auth.uid()::text = (storage.foldername(name))[1])
 WITH CHECK (auth.uid()::text = (storage.foldername(name))[1]);
 
 CREATE POLICY "Usuarios pueden eliminar su propia portada" ON storage.objects
-FOR DELETE
+FOR DELETE TO authenticated
 USING (auth.uid()::text = (storage.foldername(name))[1]);
 
 -- ============================================================================
@@ -67,25 +71,25 @@ USING (auth.uid()::text = (storage.foldername(name))[1]);
 -- ============================================================================
 
 CREATE POLICY "Usuarios pueden subir imágenes de post" ON storage.objects
-FOR INSERT WITH CHECK (
+FOR INSERT TO authenticated WITH CHECK (
     bucket_id = 'post-images' 
     AND auth.uid()::text = (storage.foldername(name))[1]
 );
 
 CREATE POLICY "Usuarios pueden ver imágenes de posts públicos" ON storage.objects
-FOR SELECT USING (
+FOR SELECT TO authenticated USING (
     bucket_id = 'post-images'
     -- Nota: La validación de si el post es público se hace en la app
-    -- Esta política permite ver todas las imágenes, filtrar en backend
+    -- Esta política permite ver todas las imágenes (a usuarios logueados), filtrar en backend
 );
 
 CREATE POLICY "Usuarios pueden actualizar sus propias imágenes" ON storage.objects
-FOR UPDATE
+FOR UPDATE TO authenticated
 USING (auth.uid()::text = (storage.foldername(name))[1])
 WITH CHECK (auth.uid()::text = (storage.foldername(name))[1]);
 
 CREATE POLICY "Usuarios pueden eliminar sus propias imágenes" ON storage.objects
-FOR DELETE
+FOR DELETE TO authenticated
 USING (auth.uid()::text = (storage.foldername(name))[1]);
 
 -- ============================================================================
@@ -93,7 +97,7 @@ USING (auth.uid()::text = (storage.foldername(name))[1]);
 -- ============================================================================
 
 CREATE POLICY "Usuarios pueden subir archivos de chat" ON storage.objects
-FOR INSERT WITH CHECK (
+FOR INSERT TO authenticated WITH CHECK (
     bucket_id = 'media-chats' 
     AND auth.uid()::text = (storage.foldername(name))[1]
 );
@@ -101,18 +105,18 @@ FOR INSERT WITH CHECK (
 -- Solo participantes de la conversación pueden ver el archivo
 -- Nota: Validación completa en aplicación (conversation_id de la carpeta)
 CREATE POLICY "Participantes pueden ver archivos de chat" ON storage.objects
-FOR SELECT USING (
+FOR SELECT TO authenticated USING (
     bucket_id = 'media-chats'
     -- Validación de pertenencia a conversación en backend
 );
 
 CREATE POLICY "Usuarios pueden actualizar sus propios archivos" ON storage.objects
-FOR UPDATE
+FOR UPDATE TO authenticated
 USING (auth.uid()::text = (storage.foldername(name))[1])
 WITH CHECK (auth.uid()::text = (storage.foldername(name))[1]);
 
 CREATE POLICY "Usuarios pueden eliminar sus propios archivos" ON storage.objects
-FOR DELETE
+FOR DELETE TO authenticated
 USING (auth.uid()::text = (storage.foldername(name))[1]);
 
 -- ============================================================================

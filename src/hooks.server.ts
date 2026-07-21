@@ -2,9 +2,11 @@ import { isOnboardingComplete } from '$lib/onboarding';
 import { createServerClient } from '@supabase/ssr';
 import type { Handle } from '@sveltejs/kit';
 import { decideAuthRedirect, type OnboardingStatus } from '$lib/auth-routing';
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+import { supabaseRealtimeTransport } from '$lib/supabase/realtime-transport';
 
 export const handle: Handle = async ({ event, resolve }) => {
-	event.locals.supabase = createServerClient(import.meta.env.PUBLIC_SUPABASE_URL, import.meta.env.PUBLIC_SUPABASE_ANON_KEY, {
+	event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
 		cookies: {
 			getAll: () => event.cookies.getAll(),
 			setAll: (cookiesToSet) => {
@@ -12,6 +14,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 					event.cookies.set(name, value, { ...options, path: '/' });
 				});
 			}
+		},
+		realtime: {
+			transport: supabaseRealtimeTransport
 		}
 	});
 

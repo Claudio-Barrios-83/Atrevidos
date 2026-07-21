@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient, Session, User } from '@supabase/supabase-js';
 import type { Database } from '$lib/database.types';
+import { supabaseRealtimeTransport } from '$lib/supabase/realtime-transport';
 
 // ⚠️ REEMPLAZA ESTE VALOR con tu clave 'anon public' del dashboard de Supabase.
 // Esta clave es segura para el frontend, no tiene permisos de admin.
@@ -9,7 +10,12 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
 
 export const supabase: SupabaseClient<Database> = createClient<Database>(
 	supabaseUrl,
-	supabaseAnonKey
+	supabaseAnonKey,
+	{
+		realtime: {
+			transport: supabaseRealtimeTransport
+		}
+	}
 );
 
 export async function getSession(): Promise<Session | null> {

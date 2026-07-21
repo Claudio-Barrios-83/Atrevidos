@@ -780,9 +780,13 @@ ALTER TABLE reports ENABLE ROW LEVEL SECURITY;
 -- Políticas RLS para profiles
 -- ----------------------------------------------------------------------------
 
--- Usuarios pueden leer perfiles de otros usuarios activos
+-- Usuarios AUTENTICADOS pueden leer perfiles de otros usuarios activos.
+-- IMPORTANTE: "TO authenticated" es obligatorio en todas las políticas de este
+-- archivo. Sin esa cláusula, Postgres asigna el rol PUBLIC por defecto, lo que
+-- incluye a "anon" y permite leer/escribir datos a cualquiera sin sesión.
 CREATE POLICY profiles_select_public ON profiles
     FOR SELECT
+    TO authenticated
     USING (
         is_active = true 
         OR auth.uid() = id
@@ -791,17 +795,20 @@ CREATE POLICY profiles_select_public ON profiles
 -- Usuarios solo pueden actualizar su propio perfil
 CREATE POLICY profiles_update_own ON profiles
     FOR UPDATE
+    TO authenticated
     USING (auth.uid() = id)
     WITH CHECK (auth.uid() = id);
 
 -- Solo el usuario puede insertar su propio perfil (trigger lo maneja)
 CREATE POLICY profiles_insert_own ON profiles
     FOR INSERT
+    TO authenticated
     WITH CHECK (auth.uid() = id);
 
 -- Solo admins/moderadores pueden eliminar perfiles
 CREATE POLICY profiles_delete_admin ON profiles
     FOR DELETE
+    TO authenticated
     USING (
         EXISTS (
             SELECT 1 FROM profiles 
@@ -814,9 +821,10 @@ CREATE POLICY profiles_delete_admin ON profiles
 -- Políticas RLS para posts
 -- ----------------------------------------------------------------------------
 
--- Todos pueden ver posts públicos
+-- Usuarios autenticados pueden ver posts públicos
 CREATE POLICY posts_select_public ON posts
     FOR SELECT
+    TO authenticated
     USING (
         visibility = 'public' 
         OR user_id = auth.uid()
@@ -831,17 +839,20 @@ CREATE POLICY posts_select_public ON posts
 -- Usuarios solo pueden crear sus propios posts
 CREATE POLICY posts_insert_own ON posts
     FOR INSERT
+    TO authenticated
     WITH CHECK (user_id = auth.uid());
 
 -- Usuarios solo pueden actualizar sus propios posts
 CREATE POLICY posts_update_own ON posts
     FOR UPDATE
+    TO authenticated
     USING (user_id = auth.uid())
     WITH CHECK (user_id = auth.uid());
 
 -- Usuarios puedenSoft-delete (archivar) sus propios posts
 CREATE POLICY posts_delete_own ON posts
     FOR DELETE
+    TO authenticated
     USING (user_id = auth.uid());
 
 -- ----------------------------------------------------------------------------
@@ -851,6 +862,7 @@ CREATE POLICY posts_delete_own ON posts
 -- Usuarios pueden ver likes en posts que ellos pueden ver
 CREATE POLICY likes_select_on_visible_posts ON likes
     FOR SELECT
+    TO authenticated
     USING (
         EXISTS (
             SELECT 1 FROM posts 
@@ -865,6 +877,7 @@ CREATE POLICY likes_select_on_visible_posts ON likes
 -- Usuarios solo pueden crear likes en posts que pueden ver
 CREATE POLICY likes_insert_valid ON likes
     FOR INSERT
+    TO authenticated
     WITH CHECK (
         user_id = auth.uid()
         AND EXISTS (
@@ -880,6 +893,7 @@ CREATE POLICY likes_insert_valid ON likes
 -- Usuarios solo pueden eliminar sus propios likes
 CREATE POLICY likes_delete_own ON likes
     FOR DELETE
+    TO authenticated
     USING (user_id = auth.uid());
 
 -- ----------------------------------------------------------------------------
@@ -889,6 +903,7 @@ CREATE POLICY likes_delete_own ON likes
 -- Usuarios pueden ver comentarios en posts que pueden ver
 CREATE POLICY comments_select_on_visible_posts ON comments
     FOR SELECT
+    TO authenticated
     USING (
         EXISTS (
             SELECT 1 FROM posts 
@@ -904,6 +919,7 @@ CREATE POLICY comments_select_on_visible_posts ON comments
 -- Usuarios solo pueden crear comentarios en posts que pueden ver
 CREATE POLICY comments_insert_valid ON comments
     FOR INSERT
+    TO authenticated
     WITH CHECK (
         user_id = auth.uid()
         AND is_hidden = false
@@ -920,12 +936,14 @@ CREATE POLICY comments_insert_valid ON comments
 -- Usuarios solo pueden actualizar sus propios comentarios
 CREATE POLICY comments_update_own ON comments
     FOR UPDATE
+    TO authenticated
     USING (user_id = auth.uid())
     WITH CHECK (user_id = auth.uid());
 
 -- Usuarios solo pueden eliminar sus propios comentarios
 CREATE POLICY comments_delete_own ON comments
     FOR DELETE
+    TO authenticated
     USING (user_id = auth.uid());
 
 -- ----------------------------------------------------------------------------
@@ -935,6 +953,7 @@ CREATE POLICY comments_delete_own ON comments
 -- Usuarios solo pueden ver sus propios matches
 CREATE POLICY matches_select_own ON matches
     FOR SELECT
+    TO authenticated
     USING (
         user_id = auth.uid() 
         OR target_user_id = auth.uid()
@@ -943,17 +962,20 @@ CREATE POLICY matches_select_own ON matches
 -- Usuarios solo pueden crear matches para sí mismos
 CREATE POLICY matches_insert_own ON matches
     FOR INSERT
+    TO authenticated
     WITH CHECK (user_id = auth.uid());
 
 -- Usuarios solo pueden actualizar sus propios matches
 CREATE POLICY matches_update_own ON matches
     FOR UPDATE
+    TO authenticated
     USING (user_id = auth.uid())
     WITH CHECK (user_id = auth.uid());
 
 -- Usuarios solo pueden eliminar sus propios matches
 CREATE POLICY matches_delete_own ON matches
     FOR DELETE
+    TO authenticated
     USING (user_id = auth.uid());
 
 -- ----------------------------------------------------------------------------
@@ -963,11 +985,13 @@ CREATE POLICY matches_delete_own ON matches
 -- Usuarios solo pueden ver conversaciones donde son participantes
 CREATE POLICY conversations_select_participant ON conversations
     FOR SELECT
+    TO authenticated
     USING (can_access_conversation(id, auth.uid()));
 
 -- Usuarios solo pueden crear conversaciones donde son creador
 CREATE POLICY conversations_insert_own ON conversations
     FOR INSERT
+    TO authenticated
     WITH CHECK (created_by = auth.uid());
 
 -- ----------------------------------------------------------------------------
@@ -977,11 +1001,13 @@ CREATE POLICY conversations_insert_own ON conversations
 -- Usuarios solo pueden ver participantes de sus conversaciones
 CREATE POLICY participants_select_own ON conversation_participants
     FOR SELECT
+    TO authenticated
     USING (can_access_conversation(conversation_id, auth.uid()));
 
 -- Sistema solo puede insertar participantes (trigger)
 CREATE POLICY participants_insert_system ON conversation_participants
     FOR INSERT
+    TO authenticated
     WITH CHECK (
         EXISTS (
             SELECT 1
@@ -998,6 +1024,7 @@ CREATE POLICY participants_insert_system ON conversation_participants
 -- Usuarios solo pueden actualizar su propia participación
 CREATE POLICY participants_update_own ON conversation_participants
     FOR UPDATE
+    TO authenticated
     USING (
         user_id = auth.uid()
         AND can_access_conversation(conversation_id, auth.uid())
@@ -1021,11 +1048,13 @@ CREATE POLICY participants_update_own ON conversation_participants
 -- Usuarios solo pueden ver mensajes de sus conversaciones
 CREATE POLICY messages_select_participant ON messages
     FOR SELECT
+    TO authenticated
     USING (can_access_conversation(conversation_id, auth.uid()));
 
 -- Usuarios solo pueden enviar mensajes a sus conversaciones
 CREATE POLICY messages_insert_participant ON messages
     FOR INSERT
+    TO authenticated
     WITH CHECK (
         sender_id = auth.uid()
         AND can_access_conversation(conversation_id, auth.uid())
@@ -1034,6 +1063,7 @@ CREATE POLICY messages_insert_participant ON messages
 -- Usuarios solo pueden actualizar sus propios mensajes (editar)
 CREATE POLICY messages_update_own ON messages
     FOR UPDATE
+    TO authenticated
     USING (
         sender_id = auth.uid()
         AND can_access_conversation(conversation_id, auth.uid())
@@ -1046,6 +1076,7 @@ CREATE POLICY messages_update_own ON messages
 -- Usuarios solo pueden "eliminar" (soft-delete) sus propios mensajes
 CREATE POLICY messages_delete_own ON messages
     FOR DELETE
+    TO authenticated
     USING (
         sender_id = auth.uid()
         AND can_access_conversation(conversation_id, auth.uid())
@@ -1058,6 +1089,7 @@ CREATE POLICY messages_delete_own ON messages
 -- Usuarios pueden ver sus propios reportes
 CREATE POLICY reports_select_own ON reports
     FOR SELECT
+    TO authenticated
     USING (
         reporter_id = auth.uid()
         OR EXISTS (
@@ -1070,11 +1102,13 @@ CREATE POLICY reports_select_own ON reports
 -- Usuarios pueden crear reportes
 CREATE POLICY reports_insert_own ON reports
     FOR INSERT
+    TO authenticated
     WITH CHECK (reporter_id = auth.uid());
 
 -- Solo admins pueden actualizar reportes (revisar/resolver)
 CREATE POLICY reports_update_admin ON reports
     FOR UPDATE
+    TO authenticated
     USING (
         EXISTS (
             SELECT 1 FROM profiles 

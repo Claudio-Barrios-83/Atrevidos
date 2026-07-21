@@ -13,6 +13,20 @@ RUN npm ci
 # Copy the rest of the app
 COPY . .
 
+# Variables PUBLIC_/VITE_ necesarias en tiempo de build: SvelteKit
+# ($env/static/public) y Vite (import.meta.env) las inlinean en el bundle del
+# cliente durante "vite build". No son secretas (la anon key está diseñada
+# para exponerse en el navegador), pero no viven en la imagen vía COPY porque
+# .env está en .dockerignore; se inyectan explícitamente como build args.
+ARG PUBLIC_SUPABASE_URL
+ARG PUBLIC_SUPABASE_ANON_KEY
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_ANON_KEY
+ENV PUBLIC_SUPABASE_URL=${PUBLIC_SUPABASE_URL}
+ENV PUBLIC_SUPABASE_ANON_KEY=${PUBLIC_SUPABASE_ANON_KEY}
+ENV VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+ENV VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+
 # Build the app
 RUN npm run build
 

@@ -2,12 +2,21 @@
 # ATREVIDOS - Docker Compose
 # ============================================================================
 # La base de datos y auth están en Supabase Cloud (externo).
-# Este compose solo levanta la app Node.js.
+# Este compose solo levanta la app Node.js, enrutada vía el Traefik que ya
+# corre en este servidor (contenedor "traefik", stack de Portainer) hacia
+# https://atrevido55.duckdns.org
+#
+# Requisitos previos (ver DEPLOY.md):
+#   1. La red externa "proxy" debe existir y Traefik debe estar unido a ella
+#      (ya es el caso en este host).
+#   2. El registro DNS de atrevido55.duckdns.org debe apuntar a la IP pública
+#      de ESTE servidor (actualizarlo con tu token de DuckDNS).
+#   3. El puerto 80/443 del router/firewall debe reenviar a este servidor.
 #
 # Uso:
-#   1. Asegúrate de tener el archivo .env con las credenciales de Supabase
-#   2. Ejecuta: docker compose up -d --build
-#   3. Abre: http://localhost:3000
+#   docker compose up -d --build
+#   Verificar: docker compose logs -f
+#   Abrir: https://atrevido55.duckdns.org
 # ============================================================================
 
 services:
@@ -15,21 +24,70 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        # docker compose sustituye estas ${VAR} leyendo el .env del proyecto.
+        # Son variables públicas (se inlinean en el JS del navegador de todas
+        # formas), por eso es seguro pasarlas como build args.
+        PUBLIC_SUPABASE_URL: ${PUBLIC_SUPABASE_URL}
+        PUBLIC_SUPABASE_ANON_KEY: ${PUBLIC_SUPABASE_ANON_KEY}
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
     container_name: atrevidos-app
-    ports:
-      - "3000:3000"
     env_file:
       - .env
     environment:
       - NODE_ENV=production
       - HOST=0.0.0.0
       - PORT=3000
-      # Las variables VITE_ se cargan desde .env
+      # ORIGIN es obligatorio para @sveltejs/adapter-node en producción: sin
+      # esta variable, el adapter asume "https" por defecto para construir
+      # URLs absolutas (redirects, cookies), lo que rompe cualquier acceso
+      # directo por IP/host interno (incluido el healthcheck). Debe coincidir
+      # con la URL pública real detrás de Traefik.
+      - ORIGIN=https://atrevido55.duckdns.org
+      # Las variables PUBLIC_/VITE_ se cargan desde .env
     restart: unless-stopped
-    # Health check para monitorear que la app responde
+    networks:
+      - proxy
+    # Health check para monitorear que la app responde.
+    # Usamos /login (ruta pública, sin redirect) en vez de "/" para evitar el
+    # redirect 303 a la URL https pública, que wget no puede seguir desde
+    # dentro del propio contenedor.
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000/login"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.atrevidos.rule=Host(`atrevido55.duckdns.org`)"
+      - "traefik.http.routers.atrevidos.entrypoints=websecure"
+      - "traefik.http.routers.atrevidos.tls.certresolver=letsencrypt"
+      - "traefik.http.services.atrevidos.loadbalancer.server.port=3000"
+      # Redirección HTTP -> HTTPS (mismo patrón que el resto del stack)
+      - "traefik.http.routers.atrevidos-insecure.rule=Host(`atrevido55.duckdns.org`)"
+      - "traefik.http.routers.atrevidos-insecure.entrypoints=web"
+      - "traefik.http.routers.atrevidos-insecure.middlewares=atrevidos-https-redirect"
+      - "traefik.http.middlewares.atrevidos-https-redirect.redirectscheme.scheme=https"
+
+  # Servicio OPCIONAL: mantiene el registro DNS de atrevido55.duckdns.org
+  # apuntando a la IP pública de este servidor. Actívalo con:
+  #   docker compose --profile duckdns up -d duckdns-updater
+  # luego de definir DUCKDNS_TOKEN en tu .env (obtenerlo en https://www.duckdns.org).
+  duckdns-updater:
+    image: lscr.io/linuxserver/duckdns:latest
+    container_name: atrevidos-duckdns
+    profiles:
+      - duckdns
+    environment:
+      - TZ=America/Argentina/Buenos_Aires
+      - SUBDOMAINS=atrevido55
+      - TOKEN=${DUCKDNS_TOKEN:-}
+      - LOG_FILE=false
+    restart: unless-stopped
+
+networks:
+  proxy:
+    external: true

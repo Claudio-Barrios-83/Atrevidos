@@ -46,6 +46,12 @@ CREATE TRIGGER trg_prevent_self_verification_elevation
   FOR EACH ROW
   EXECUTE FUNCTION prevent_self_verification_elevation();
 
+-- Estas dos funciones son triggers internos: no deben quedar invocables
+-- directamente vía /rest/v1/rpc/... (Postgres otorga EXECUTE a PUBLIC por
+-- defecto al crear una función, hay que revocarlo explícitamente).
+REVOKE EXECUTE ON FUNCTION prevent_self_admin_elevation() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION prevent_self_verification_elevation() FROM PUBLIC;
+
 -- Reemplazo de las policies de admin para usar is_admin en vez de is_verified
 DROP POLICY IF EXISTS profiles_delete_admin ON profiles;
 CREATE POLICY profiles_delete_admin ON profiles

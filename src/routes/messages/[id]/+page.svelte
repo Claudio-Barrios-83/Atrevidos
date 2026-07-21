@@ -20,6 +20,8 @@
   import { auth } from '$lib';
   import { supabase } from '$lib/supabase/client';
   import { resolveStorageImageUrl } from '$lib/supabase/profile-media';
+  import { deleteMessageMedia, resolveMessageMediaUrl, uploadMessageMedia } from '$lib/supabase/message-media';
+  import { MESSAGE_MEDIA_MIME_TYPES, validateMessageMediaFile } from '$lib/message-media';
   import { onDestroy, tick } from 'svelte';
 
   const USER_CONVERSATIONS_VIEW = 'user_conversations' as never;
@@ -46,10 +48,15 @@
   let conversation: ConversationPageView | null = null;
   let messageRows: DirectMessageRow[] = [];
   let messageItems: DirectMessageItem[] = [];
+  let resolvedMediaUrls: Record<string, string | null> = {};
   let draft = '';
   let sending = false;
   let sendError = '';
   let sendSuccess = '';
+  let mediaInput: HTMLInputElement | null = null;
+  let selectedMediaFile: File | null = null;
+  let selectedMediaPreviewUrl: string | null = null;
+  let mediaError = '';
   let reportFeedback = '';
   let blockingConversation = false;
   let blockedConversationRevocation: BlockedDirectConversationRevocation | null = null;
@@ -83,6 +90,8 @@
     loading = false;
     conversation = null;
     messageRows = [];
+    resolvedMediaUrls = {};
+    clearSelectedMedia();
     syncMessageItems();
     draft = '';
     sendError = '';
@@ -105,6 +114,70 @@
 
   function syncMessageItems() {
     messageItems = activeUserId ? buildDirectMessageItems(activeUserId, messageRows) : [];
+    void resolvePendingMediaUrls();
+  }
+
+  async function resolvePendingMediaUrls() {
+    const itemsNeedingResolution = messageItems.filter(
+      (item) => item.mediaUrl && !(item.id in resolvedMediaUrls)
+    );
+
+    if (itemsNeedingResolution.length === 0) {
+      return;
+    }
+
+    const resolved = await Promise.allSettled(
+      itemsNeedingResolution.map((item) => resolveMessageMediaUrl(item.mediaUrl))
+    );
+
+    const nextResolvedMediaUrls = { ...resolvedMediaUrls };
+
+    itemsNeedingResolution.forEach((item, index) => {
+      const result = resolved[index];
+      nextResolvedMediaUrls[item.id] = result.status === 'fulfilled' ? (result.value ?? null) : null;
+    });
+
+    resolvedMediaUrls = nextResolvedMediaUrls;
+  }
+
+  function handleMediaFileChange(event: Event) {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+
+    mediaError = '';
+
+    if (!file) {
+      return;
+    }
+
+    const validation = validateMessageMediaFile(file);
+
+    if (!validation.valid) {
+      mediaError = validation.error;
+      input.value = '';
+      return;
+    }
+
+    if (selectedMediaPreviewUrl) {
+      URL.revokeObjectURL(selectedMediaPreviewUrl);
+    }
+
+    selectedMediaFile = file;
+    selectedMediaPreviewUrl = URL.createObjectURL(file);
+  }
+
+  function clearSelectedMedia() {
+    if (selectedMediaPreviewUrl) {
+      URL.revokeObjectURL(selectedMediaPreviewUrl);
+    }
+
+    selectedMediaFile = null;
+    selectedMediaPreviewUrl = null;
+    mediaError = '';
+
+    if (mediaInput) {
+      mediaInput.value = '';
+    }
   }
 
   async function scrollTimelineToBottom() {
@@ -235,6 +308,8 @@
       clearLiveUpdates();
       conversation = null;
       messageRows = [];
+      resolvedMediaUrls = {};
+      clearSelectedMedia();
       syncMessageItems();
       loading = false;
       loadError = '';
@@ -367,12 +442,13 @@
     const userId = activeUserId;
     const conversationId = activeConversationId;
     const trimmedDraft = draft.trim();
+    const mediaFile = selectedMediaFile;
 
     if (
       !userId ||
       !conversationId ||
       !conversation ||
-      !trimmedDraft ||
+      (!trimmedDraft && !mediaFile) ||
       sending ||
       shouldIgnoreBlockedDirectConversationUpdate(
         blockedConversationRevocation,
@@ -386,14 +462,25 @@
     sending = true;
     sendError = '';
     sendSuccess = '';
+    let uploadedMediaRef: string | null = null;
 
     try {
+      if (mediaFile) {
+        const uniqueSuffix =
+          typeof crypto !== 'undefined' && 'randomUUID' in crypto
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+        uploadedMediaRef = await uploadMessageMedia(userId, conversationId, mediaFile, uniqueSuffix);
+      }
+
       const { data, error } = await supabase
         .from(MESSAGES_TABLE)
         .insert({
           conversation_id: conversationId,
           sender_id: userId,
-          content: trimmedDraft
+          content: trimmedDraft || null,
+          media_url: uploadedMediaRef,
+          media_type: uploadedMediaRef ? mediaFile?.type ?? null : null
         } as never)
         .select('id, conversation_id, sender_id, content, media_url, media_type, is_deleted, created_at, updated_at')
         .single();
@@ -413,12 +500,17 @@
       }
 
       draft = '';
+      clearSelectedMedia();
       sendSuccess = 'Mensaje enviado.';
       mergeMessageRow(data as DirectMessageRow);
       syncMessageItems();
       await markConversationRead(conversationId, userId);
       await scrollTimelineToBottom();
     } catch (error) {
+      if (uploadedMediaRef) {
+        await deleteMessageMedia(uploadedMediaRef).catch(() => {});
+      }
+
       console.error('Error sending message:', error);
       sendError = 'No pudimos enviar tu mensaje. Inténtalo otra vez.';
     } finally {
@@ -494,6 +586,8 @@
       loadError = '';
       conversation = null;
       messageRows = [];
+      resolvedMediaUrls = {};
+      clearSelectedMedia();
       syncMessageItems();
       reportFeedback = '';
       blockingConversation = false;
@@ -505,6 +599,10 @@
 
   onDestroy(() => {
     clearLiveUpdates();
+
+    if (selectedMediaPreviewUrl) {
+      URL.revokeObjectURL(selectedMediaPreviewUrl);
+    }
   });
 </script>
 
@@ -632,9 +730,25 @@
                       Reportar
                     </button>
                   </div>
-                  <p class={`mt-2 whitespace-pre-wrap text-sm leading-6 ${message.isDeleted ? 'italic opacity-80' : ''}`}>
-                    {message.content || 'Mensaje vacío'}
-                  </p>
+                  {#if message.mediaUrl && resolvedMediaUrls[message.id]}
+                    <img
+                      src={resolvedMediaUrls[message.id]}
+                      alt="Imagen enviada en el chat"
+                      class="mt-2 max-h-72 w-full rounded-2xl object-cover"
+                      loading="lazy"
+                    />
+                  {:else if message.mediaUrl}
+                    <div class="mt-2 flex h-24 w-full items-center justify-center rounded-2xl bg-black/10 text-xs">
+                      Cargando imagen…
+                    </div>
+                  {/if}
+                  {#if message.content}
+                    <p class={`mt-2 whitespace-pre-wrap text-sm leading-6 ${message.isDeleted ? 'italic opacity-80' : ''}`}>
+                      {message.content}
+                    </p>
+                  {:else if !message.mediaUrl}
+                    <p class="mt-2 whitespace-pre-wrap text-sm leading-6 italic opacity-80">Mensaje vacío</p>
+                  {/if}
                   <p class={`mt-3 text-[11px] ${message.isOwnMessage ? 'text-primary-100' : 'text-gray-500 dark:text-gray-400'}`}>
                     {formatTimestamp(message.createdAt)}
                   </p>
@@ -658,20 +772,57 @@
             class="mt-3 w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-200 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-primary-400 dark:focus:ring-primary-900"
           ></textarea>
 
+          <input
+            bind:this={mediaInput}
+            type="file"
+            accept={MESSAGE_MEDIA_MIME_TYPES.join(',')}
+            class="hidden"
+            disabled={sending}
+            on:change={handleMediaFileChange}
+          />
+
+          {#if selectedMediaPreviewUrl}
+            <div class="mt-3 flex items-center gap-3 rounded-2xl border border-dashed border-gray-300 p-3 dark:border-gray-600">
+              <img src={selectedMediaPreviewUrl} alt="Vista previa" class="h-16 w-16 rounded-xl object-cover" />
+              <div class="flex-1 text-xs text-gray-500 dark:text-gray-400">{selectedMediaFile?.name}</div>
+              <button
+                type="button"
+                on:click={clearSelectedMedia}
+                disabled={sending}
+                class="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-900/60 dark:text-red-300 dark:hover:bg-red-950/30"
+              >
+                Quitar
+              </button>
+            </div>
+          {/if}
+
+          {#if mediaError}
+            <p class="mt-2 text-xs text-red-600 dark:text-red-300">{mediaError}</p>
+          {/if}
+
           <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div class="space-y-1 text-sm" aria-live="polite">
-              {#if sendError}
-                <p class="text-red-600 dark:text-red-300">{sendError}</p>
-              {:else if sendSuccess}
-                <p class="text-emerald-600 dark:text-emerald-300">{sendSuccess}</p>
-              {:else}
-                <p class="text-gray-500 dark:text-gray-400">Solo texto por ahora. El soporte multimedia llegará después.</p>
-              {/if}
+            <div class="flex items-center gap-3">
+              <button
+                type="button"
+                on:click={() => mediaInput?.click()}
+                disabled={sending}
+                class="inline-flex items-center gap-2 rounded-xl border border-gray-300 px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
+              >
+                📷 Imagen
+              </button>
+
+              <div class="space-y-1 text-sm" aria-live="polite">
+                {#if sendError}
+                  <p class="text-red-600 dark:text-red-300">{sendError}</p>
+                {:else if sendSuccess}
+                  <p class="text-emerald-600 dark:text-emerald-300">{sendSuccess}</p>
+                {/if}
+              </div>
             </div>
 
             <button
               type="submit"
-              disabled={sending || draft.trim().length === 0}
+              disabled={sending || (draft.trim().length === 0 && !selectedMediaFile)}
               class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {#if sending}Enviando…{:else}Enviar{/if}

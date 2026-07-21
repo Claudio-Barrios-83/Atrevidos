@@ -10,6 +10,7 @@ export type UserConversationRow = {
   last_message_content: string | null;
   last_message_time: string | null;
   last_message_sender: string | null;
+  last_message_media_url: string | null;
   unread_count: number | null;
 };
 
@@ -200,7 +201,7 @@ export function buildConversationListItems(
       counterpartAvatarUrl: counterpartProfile.avatar_url,
       hasConversation: true,
       lastActivityAt: resolveLastActivityAt(conversation),
-      lastMessagePreview: conversation.last_message_content,
+      lastMessagePreview: conversation.last_message_content || (conversation.last_message_media_url ? '📷 Foto' : null),
       lastMessageSenderName: conversation.last_message_sender,
       unreadCount: Math.max(0, conversation.unread_count ?? 0)
     });

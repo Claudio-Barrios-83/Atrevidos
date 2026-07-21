@@ -19,6 +19,7 @@ const baseConversation = (overrides: Partial<UserConversationRow> = {}): UserCon
   last_message_content: 'Hola, ¿cómo va todo?',
   last_message_time: '2026-06-05T12:00:00.000Z',
   last_message_sender: 'Alex',
+  last_message_media_url: null,
   unread_count: 2,
   ...overrides
 });

@@ -95,7 +95,7 @@
       const { data: conversationRows, error: conversationsError } = await supabase
         .from(USER_CONVERSATIONS_VIEW)
         .select(
-          'id, is_group, name, avatar_url, last_message_at, created_at, last_message_content, last_message_time, last_message_sender, unread_count'
+          'id, is_group, name, avatar_url, last_message_at, created_at, last_message_content, last_message_time, last_message_sender, unread_count, last_message_media_url'
         )
         .eq('is_group', false)
         .order('last_message_time', { ascending: false, nullsFirst: false })

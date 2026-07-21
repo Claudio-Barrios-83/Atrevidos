@@ -67,6 +67,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "public_feed"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "comments_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -196,6 +203,13 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "public_feed"
             referencedColumns: ["id"]
           },
           {
@@ -614,6 +628,38 @@ export type Database = {
       }
     }
     Views: {
+      public_feed: {
+        Row: {
+          avatar_url: string | null
+          comment_count: number | null
+          content: string | null
+          created_at: string | null
+          display_name: string | null
+          id: string | null
+          image_urls: string[] | null
+          is_anonymous: boolean | null
+          is_archived: boolean | null
+          is_pinned: boolean | null
+          is_verified: boolean | null
+          like_count: number | null
+          relation_type: string | null
+          share_count: number | null
+          updated_at: string | null
+          user_id: string | null
+          username: string | null
+          video_url: string | null
+          visibility: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_conversations: {
         Row: {
           avatar_url: string | null
@@ -622,6 +668,7 @@ export type Database = {
           is_group: boolean | null
           last_message_at: string | null
           last_message_content: string | null
+          last_message_media_url: string | null
           last_message_sender: string | null
           last_message_time: string | null
           name: string | null
@@ -664,6 +711,12 @@ export type Database = {
           status: Database["public"]["Enums"]["subscription_status"]
           updated_at: string
           user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "subscriptions"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       create_conversation_for_match: {
@@ -709,6 +762,12 @@ export type Database = {
           updated_at: string
           user_id: string
         }
+        SetofOptions: {
+          from: "*"
+          to: "subscriptions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       upsert_subscription_status: {
         Args: {
@@ -730,6 +789,12 @@ export type Database = {
           status: Database["public"]["Enums"]["subscription_status"]
           updated_at: string
           user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "subscriptions"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
     }

@@ -48,6 +48,8 @@ export type DirectMessageItem = {
   conversationId: string;
   senderId: string;
   content: string;
+  mediaUrl: string | null;
+  mediaType: string | null;
   createdAt: string;
   updatedAt: string;
   isOwnMessage: boolean;
@@ -104,10 +106,6 @@ function resolveMessageContent(message: DirectMessageRow) {
 
   if (message.content && message.content.trim().length > 0) {
     return message.content;
-  }
-
-  if (message.media_url) {
-    return 'Contenido multimedia no compatible todavía.';
   }
 
   return '';
@@ -171,6 +169,8 @@ export function buildDirectMessageItems(activeUserId: string, messages: DirectMe
       conversationId: message.conversation_id,
       senderId: message.sender_id,
       content: resolveMessageContent(message),
+      mediaUrl: message.is_deleted ? null : message.media_url,
+      mediaType: message.is_deleted ? null : message.media_type,
       createdAt: message.created_at,
       updatedAt: message.updated_at,
       isOwnMessage: message.sender_id === activeUserId,

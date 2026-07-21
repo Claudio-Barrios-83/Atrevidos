@@ -205,6 +205,8 @@ describe('buildDirectMessageItems', () => {
         conversationId: 'conversation-1',
         senderId: 'me',
         content: 'Hola',
+        mediaUrl: null,
+        mediaType: null,
         createdAt: '2026-06-05T12:00:00.000Z',
         updatedAt: '2026-06-05T12:00:00.000Z',
         isOwnMessage: true,
@@ -215,6 +217,8 @@ describe('buildDirectMessageItems', () => {
         conversationId: 'conversation-1',
         senderId: 'match-1',
         content: '¿Qué tal?',
+        mediaUrl: null,
+        mediaType: null,
         createdAt: '2026-06-05T12:05:00.000Z',
         updatedAt: '2026-06-05T12:00:00.000Z',
         isOwnMessage: false,
@@ -223,17 +227,19 @@ describe('buildDirectMessageItems', () => {
     ]);
   });
 
-  it('renders safe fallback content for deleted or media-only messages', () => {
+  it('renders safe fallback content for deleted messages and exposes media for media-only messages', () => {
     const items = buildDirectMessageItems('me', [
-      baseMessage({ id: 'deleted', content: null, is_deleted: true }),
+      baseMessage({ id: 'deleted', content: null, is_deleted: true, media_url: 'https://example.com/deleted.jpg' }),
       baseMessage({ id: 'media-only', content: null, media_url: 'https://example.com/file.jpg', media_type: 'image/jpeg' })
     ]);
 
     expect(items).toEqual<DirectMessageItem[]>([
-      expect.objectContaining({ id: 'deleted', content: 'Mensaje eliminado', isDeleted: true }),
+      expect.objectContaining({ id: 'deleted', content: 'Mensaje eliminado', mediaUrl: null, isDeleted: true }),
       expect.objectContaining({
         id: 'media-only',
-        content: 'Contenido multimedia no compatible todavía.',
+        content: '',
+        mediaUrl: 'https://example.com/file.jpg',
+        mediaType: 'image/jpeg',
         isDeleted: false
       })
     ]);

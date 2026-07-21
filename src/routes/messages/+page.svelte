@@ -15,18 +15,38 @@
   import { supabase } from '$lib/supabase/client';
   import { resolveStorageImageUrl } from '$lib/supabase/profile-media';
   import AppShell from '$lib/components/app-shell.svelte';
+  import type { MutualMatchRow } from '$lib/matches';
+  import { buildMatchListItems, type MatchListItem } from '$lib/matches';
 
   const USER_CONVERSATIONS_VIEW = 'user_conversations' as never;
   const CONVERSATION_PARTICIPANTS_TABLE = 'conversation_participants' as never;
+  const CONVERSATIONS_TABLE = 'conversations' as never;
   const MATCHES_TABLE = 'matches' as never;
   const PROFILES_TABLE = 'profiles' as never;
+
+  type GroupListItem = {
+    id: string;
+    name: string;
+    avatarUrl: string | null;
+    lastMessagePreview: string | null;
+    lastActivityAt: string | null;
+    unreadCount: number;
+  };
 
   let activeUserId: string | null = null;
   let latestRequest = 0;
   let loading = false;
   let loadError = '';
   let conversations: ConversationListItem[] = [];
+  let groups: GroupListItem[] = [];
   let signingOut = false;
+
+  let showCreateGroupForm = false;
+  let creatingGroup = false;
+  let createGroupError = '';
+  let groupNameDraft = '';
+  let mutualMatchOptions: MatchListItem[] = [];
+  let selectedGroupMemberIds = new Set<string>();
 
   async function handleSignOut() {
     if (signingOut) return;
@@ -215,10 +235,174 @@
     }
   }
 
+  async function loadGroups() {
+    const user = $auth.user;
+
+    if (!user) {
+      groups = [];
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from(USER_CONVERSATIONS_VIEW)
+        .select('id, name, avatar_url, last_message_at, last_message_content, last_message_time, unread_count, last_message_media_url')
+        .eq('is_group', true)
+        .order('last_message_time', { ascending: false, nullsFirst: false })
+        .order('last_message_at', { ascending: false, nullsFirst: false });
+
+      if (error) {
+        throw error;
+      }
+
+      type GroupRow = {
+        id: string;
+        name: string | null;
+        avatar_url: string | null;
+        last_message_at: string | null;
+        last_message_content: string | null;
+        last_message_time: string | null;
+        unread_count: number | null;
+        last_message_media_url: string | null;
+      };
+
+      const rows = (data ?? []) as GroupRow[];
+      const resolvedAvatars = await Promise.allSettled(rows.map((row) => resolveStorageImageUrl(row.avatar_url)));
+
+      groups = rows.map((row, index) => ({
+        id: row.id,
+        name: row.name || 'Grupo sin nombre',
+        avatarUrl: resolvedAvatars[index]?.status === 'fulfilled' ? (resolvedAvatars[index].value ?? null) : null,
+        lastMessagePreview: row.last_message_content || (row.last_message_media_url ? '📷 Foto' : null),
+        lastActivityAt: row.last_message_time || row.last_message_at,
+        unreadCount: Math.max(0, row.unread_count ?? 0)
+      }));
+    } catch (error) {
+      console.error('Error loading groups:', error);
+    }
+  }
+
+  async function loadMutualMatchOptions(userId: string) {
+    try {
+      const [{ data: matchRows, error: matchesError }, { data: blockedRows, error: blockedError }] = await Promise.all([
+        supabase
+          .from(MATCHES_TABLE)
+          .select(
+            `
+              id,
+              target_user_id,
+              match_type,
+              created_at,
+              target_profile:profiles!matches_target_user_id_fkey ( id, username, display_name, avatar_url, location, interests, relationship_intent )
+            `
+          )
+          .eq('user_id', userId)
+          .eq('is_mutual', true),
+        supabase.from(MATCHES_TABLE).select('user_id, target_user_id, match_type').eq('match_type', 'block').or(`user_id.eq.${userId},target_user_id.eq.${userId}`)
+      ]);
+
+      if (matchesError) throw matchesError;
+      if (blockedError) throw blockedError;
+
+      const blockedUserIds = new Set<string>();
+      for (const row of (blockedRows ?? []) as Array<{ user_id: string; target_user_id: string }>) {
+        blockedUserIds.add(row.user_id === userId ? row.target_user_id : row.user_id);
+      }
+
+      mutualMatchOptions = buildMatchListItems((matchRows ?? []) as MutualMatchRow[], blockedUserIds);
+    } catch (error) {
+      console.error('Error loading mutual matches for group creation:', error);
+      mutualMatchOptions = [];
+    }
+  }
+
+  function toggleGroupMemberSelection(userId: string) {
+    const next = new Set(selectedGroupMemberIds);
+    if (next.has(userId)) {
+      next.delete(userId);
+    } else {
+      next.add(userId);
+    }
+    selectedGroupMemberIds = next;
+  }
+
+  async function openCreateGroupForm() {
+    showCreateGroupForm = true;
+    createGroupError = '';
+    groupNameDraft = '';
+    selectedGroupMemberIds = new Set();
+
+    if ($auth.user?.id) {
+      await loadMutualMatchOptions($auth.user.id);
+    }
+  }
+
+  function closeCreateGroupForm() {
+    showCreateGroupForm = false;
+    createGroupError = '';
+  }
+
+  async function createGroup() {
+    const user = $auth.user;
+    const trimmedName = groupNameDraft.trim();
+
+    if (!user || creatingGroup) return;
+
+    if (!trimmedName) {
+      createGroupError = 'Elegí un nombre para el grupo.';
+      return;
+    }
+
+    if (selectedGroupMemberIds.size < 2) {
+      createGroupError = 'Seleccioná al menos 2 matches para armar el grupo.';
+      return;
+    }
+
+    creatingGroup = true;
+    createGroupError = '';
+
+    try {
+      const { data: conversation, error: conversationError } = await supabase
+        .from(CONVERSATIONS_TABLE)
+        .insert({ is_group: true, name: trimmedName, created_by: user.id } as never)
+        .select('id')
+        .single();
+
+      if (conversationError) throw conversationError;
+
+      const conversationId = (conversation as { id: string }).id;
+
+      const { error: selfParticipantError } = await supabase
+        .from(CONVERSATION_PARTICIPANTS_TABLE)
+        .insert({ conversation_id: conversationId, user_id: user.id, role: 'admin' } as never);
+
+      if (selfParticipantError) throw selfParticipantError;
+
+      const memberRows = Array.from(selectedGroupMemberIds).map((memberId) => ({
+        conversation_id: conversationId,
+        user_id: memberId,
+        role: 'member'
+      }));
+
+      const { error: memberError } = await supabase.from(CONVERSATION_PARTICIPANTS_TABLE).insert(memberRows as never);
+
+      if (memberError) throw memberError;
+
+      showCreateGroupForm = false;
+      window.location.href = `/messages/group/${conversationId}`;
+    } catch (error) {
+      console.error('Error creating group:', error);
+      createGroupError = 'No pudimos crear el grupo. Inténtalo de nuevo.';
+    } finally {
+      creatingGroup = false;
+    }
+  }
+
   $: if ($auth.initialized) {
     if ($auth.user?.id && $auth.user.id !== activeUserId) {
       activeUserId = $auth.user.id;
       void loadConversations();
+      void loadGroups();
     }
 
     if (!$auth.user) {
@@ -227,6 +411,10 @@
       loading = false;
       loadError = '';
       conversations = [];
+      groups = [];
+      showCreateGroupForm = false;
+      mutualMatchOptions = [];
+      selectedGroupMemberIds = new Set();
     }
   }
 </script>
@@ -243,7 +431,15 @@
         </p>
       </div>
 
-      <button
+      <div class="flex gap-2">
+        <button
+          type="button"
+          on:click={openCreateGroupForm}
+          class="inline-flex items-center justify-center rounded-xl border border-primary-300 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-50 dark:border-primary-800 dark:text-primary-300 dark:hover:bg-primary-950/30"
+        >
+          + Nuevo grupo
+        </button>
+        <button
         type="button"
         on:click={loadConversations}
         disabled={loading}
@@ -251,7 +447,100 @@
       >
         {#if loading}Actualizando…{:else}Actualizar{/if}
       </button>
+      </div>
     </header>
+
+    {#if showCreateGroupForm}
+      <section class="rounded-2xl bg-white p-5 shadow-lg ring-1 ring-primary-200 dark:bg-gray-800 dark:ring-primary-900">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Crear grupo</h2>
+          <button type="button" on:click={closeCreateGroupForm} class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400">
+            Cerrar
+          </button>
+        </div>
+
+        <label class="mt-4 block text-sm font-medium text-gray-900 dark:text-white" for="group-name">Nombre del grupo</label>
+        <input
+          id="group-name"
+          type="text"
+          bind:value={groupNameDraft}
+          maxlength="80"
+          placeholder="Ej. Amigos de la playa"
+          class="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+        />
+
+        <p class="mt-4 text-sm font-medium text-gray-900 dark:text-white">
+          Elegí al menos 2 matches mutuos ({selectedGroupMemberIds.size} seleccionados)
+        </p>
+
+        {#if mutualMatchOptions.length === 0}
+          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Todavía no tenés matches mutuos para armar un grupo. Conseguí algunos en Descubrir.
+          </p>
+        {:else}
+          <div class="mt-2 max-h-64 space-y-2 overflow-y-auto">
+            {#each mutualMatchOptions as match (match.matchedUserId)}
+              <label class="flex items-center gap-3 rounded-xl border border-gray-200 p-3 dark:border-gray-700">
+                <input
+                  type="checkbox"
+                  checked={selectedGroupMemberIds.has(match.matchedUserId)}
+                  on:change={() => toggleGroupMemberSelection(match.matchedUserId)}
+                  class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                />
+                <span class="text-sm font-medium text-gray-900 dark:text-white">{match.displayName}</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400">@{match.username}</span>
+              </label>
+            {/each}
+          </div>
+        {/if}
+
+        {#if createGroupError}
+          <p class="mt-3 text-sm text-red-600 dark:text-red-300">{createGroupError}</p>
+        {/if}
+
+        <button
+          type="button"
+          on:click={createGroup}
+          disabled={creatingGroup}
+          class="mt-4 inline-flex items-center justify-center rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {#if creatingGroup}Creando…{:else}Crear grupo{/if}
+        </button>
+      </section>
+    {/if}
+
+    {#if groups.length > 0}
+      <section class="space-y-3">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Grupos</h2>
+        {#each groups as group (group.id)}
+          <a
+            href={`/messages/group/${group.id}`}
+            class="flex items-center gap-4 rounded-2xl bg-white p-4 shadow-lg ring-1 ring-gray-200 transition hover:ring-primary-300 dark:bg-gray-800 dark:ring-gray-700"
+          >
+            {#if group.avatarUrl}
+              <img src={group.avatarUrl} alt={group.name} class="h-12 w-12 rounded-2xl object-cover" />
+            {:else}
+              <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-fuchsia-100 text-lg font-bold text-fuchsia-600 dark:bg-fuchsia-950/40 dark:text-fuchsia-300">
+                👥
+              </div>
+            {/if}
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <h3 class="truncate text-sm font-semibold text-gray-900 dark:text-white">{group.name}</h3>
+                {#if group.unreadCount > 0}
+                  <span class="inline-flex items-center rounded-full bg-primary-600 px-2 py-0.5 text-xs font-semibold text-white">
+                    {group.unreadCount}
+                  </span>
+                {/if}
+              </div>
+              <p class="truncate text-xs text-gray-500 dark:text-gray-400">
+                {group.lastMessagePreview || 'Aún no hay mensajes en este grupo.'}
+              </p>
+            </div>
+          </a>
+        {/each}
+      </section>
+    {/if}
 
     {#if loading}
       <section class="rounded-2xl bg-white px-6 py-12 text-center shadow-lg dark:bg-gray-800">

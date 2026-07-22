@@ -124,11 +124,14 @@
               <p class="mt-2 text-sm text-white/90">Se renueva el {periodEndLabel}</p>
             {/if}
           {:else}
-            <p class="text-sm font-semibold uppercase tracking-wide text-white/80">Argentina 🇦🇷 &amp; Brasil 🇧🇷</p>
+            <p class="text-sm font-semibold uppercase tracking-wide text-white/80">Brasil 🇧🇷 — Mercado Pago</p>
             <p class="mt-2 text-5xl font-extrabold">
-              $2.990<span class="text-lg font-semibold text-white/80">/mes ARS*</span>
+              R$&nbsp;19,90<span class="text-lg font-semibold text-white/80">/mês</span>
             </p>
-            <p class="mt-2 text-sm text-white/90">*Precio de referencia inicial. Cancelá cuando quieras.</p>
+            <p class="mt-2 text-sm text-white/90">
+              Precio de referencia para beta en Brasil. Cancelá cuando quieras.
+              <span class="block text-white/70">Argentina (ARS) se habilitará más adelante.</span>
+            </p>
           {/if}
         </div>
 
@@ -178,7 +181,7 @@
                 {#if actionPending}Activando…{:else}Quiero ser Premium →{/if}
               </button>
               <p class="mt-3 text-center text-xs text-gray-400 dark:text-gray-500">
-                Modo de prueba: se activa al instante, sin pasarela de pago real todavía.
+                Modo beta: activación instantánea sin cobro real. Pagos con Mercado Pago Brasil (BRL) próximamente.
               </p>
             {/if}
           </div>
@@ -186,8 +189,8 @@
       </div>
 
       <p class="mt-8 text-center text-xs text-gray-400 dark:text-gray-500">
-        Los pagos reales se procesarán próximamente vía MercadoPago para Argentina y Brasil. Por ahora, esta pantalla
-        funciona en modo de demostración.
+        Los pagos reales se procesarán vía Mercado Pago Brasil (CPF/CNPJ, moneda BRL). No se requiere CUIT argentino.
+        Por ahora, esta pantalla funciona en modo de demostración.
       </p>
     {/if}
   </div>

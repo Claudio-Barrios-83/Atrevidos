@@ -6,70 +6,120 @@ import type {
 } from './types';
 
 /**
- * Adaptador REAL de MercadoPago (Preapproval API = suscripciones recurrentes).
+ * Adaptador REAL de Mercado Pago (Preapproval API = suscripciones recurrentes).
  *
- * Por qué MercadoPago y no Stripe: el lanzamiento prioriza Argentina y
- * Brasil, y Stripe tiene soporte muy limitado de cobros recurrentes en
- * Brasil (requiere Stripe Connect + entidad local en muchos casos), mientras
- * que MercadoPago es nativo en ambos países con un único plan/moneda por
- * cuenta. Como todavía no existe una cuenta de MercadoPago para Atrevidos,
- * este adaptador NO se usa en runtime (ver src/lib/payments/index.ts): queda
- * implementado y documentado para activarlo el día que el usuario cree la
- * cuenta y complete el alta de aplicación.
+ * Lanzamiento inicial: **Brasil** (BRL, CPF/CNPJ/MEI — no CUIT). Argentina queda
+ * para cuando el operador tenga entidad allí (CUIT + ARS).
+ *
+ * Por qué Mercado Pago y no Stripe: MP es nativo en BR y AR con un plan/moneda
+ * por cuenta. Stripe tiene soporte limitado de recurrentes en Brasil.
  *
  * ------------------------------------------------------------------------
- * PENDIENTE DEL LADO DEL USUARIO (no resoluble por el agente):
+ * PENDIENTE DEL LADO DEL USUARIO (Brasil):
  * ------------------------------------------------------------------------
- *   1. Crear cuenta de MercadoPago (o MercadoPago Brasil) para el negocio.
- *   2. Crear una aplicación en https://www.mercadopago.com.ar/developers
- *      y obtener el Access Token de producción.
- *   3. Crear un plan de "Preapproval" (suscripción recurrente) desde el
- *      dashboard o vía API con el precio único definido para Atrevidos
- *      Premium.
- *   4. Configurar estas variables de entorno en el servidor (.env, NUNCA
- *      con prefijo PUBLIC_/VITE_ porque son secretas):
- *        MERCADOPAGO_ACCESS_TOKEN=...          (token privado de la app)
- *        MERCADOPAGO_PLAN_ID=...               (id del plan de preapproval)
- *        MERCADOPAGO_WEBHOOK_SECRET=...        (para validar firma de webhooks)
- *   5. Registrar la URL del webhook en el dashboard de MercadoPago:
- *        https://<tu-proyecto>.supabase.co/functions/v1/payments-webhook
- *   6. Una vez configuradas esas variables, cambiar
- *      PAYMENTS_PROVIDER=mercadopago en el entorno del servidor (ver
- *      src/lib/payments/index.ts) para que la app deje de usar el adaptador
- *      mock automáticamente.
+ *   1. Crear conta Mercado Pago Brasil (pessoa física con CPF, MEI ou CNPJ).
+ *      No se requiere CUIT argentino.
+ *   2. Crear aplicación en https://www.mercadopago.com.br/developers
+ *      y obtener Access Token (TEST para sandbox, APP_USR para producción).
+ *   3. Crear plan Preapproval en BRL (ver docs/LANZAMIENTO-BR.md):
+ *        POST /preapproval_plan  →  auto_recurring.currency_id = "BRL"
+ *   4. Variables de entorno en servidor (.env / Supabase secrets, NUNCA PUBLIC_):
+ *        MERCADOPAGO_ACCESS_TOKEN=...
+ *        MERCADOPAGO_PLAN_ID=...
+ *        MERCADOPAGO_WEBHOOK_SECRET=...
+ *        MERCADOPAGO_COUNTRY=BR          (opcional, default BR)
+ *        MERCADOPAGO_CURRENCY=BRL        (opcional, default BRL)
+ *   5. Webhook en dashboard MP:
+ *        https://<proyecto>.supabase.co/functions/v1/payments-webhook
+ *   6. Con las tres variables obligatorias seteadas, getPaymentsAdapter() deja
+ *      de usar el mock automáticamente.
+ *
+ * Preference API (pagos únicos, no suscripción):
+ *   POST /checkout/preferences con items[].currency_id = "BRL" y
+ *   items[].unit_price en reales. Atrevidos Premium usa Preapproval; Preference
+ *   queda documentada para futuros productos one-shot.
  * ------------------------------------------------------------------------
  */
 
 const MERCADOPAGO_API_BASE = 'https://api.mercadopago.com';
 
+/** Portales de developers por país (solo documentación / onboarding). */
+export const MERCADOPAGO_DEVELOPER_PORTALS = {
+  BR: 'https://www.mercadopago.com.br/developers',
+  AR: 'https://www.mercadopago.com.ar/developers'
+} as const;
+
+export type MercadoPagoCountry = keyof typeof MERCADOPAGO_DEVELOPER_PORTALS;
+
+export type MercadoPagoAdapterConfig = {
+  accessToken: string;
+  planId: string;
+  webhookSecret: string;
+  /** ISO país de la cuenta MP. Default: BR (lanzamiento inicial). */
+  country?: MercadoPagoCountry;
+  /** Moneda del plan recurrente. Default: BRL. */
+  currency?: 'BRL' | 'ARS';
+  backUrl?: string;
+};
+
+/** Payload de referencia para crear el plan Preapproval en Brasil (ver docs). */
+export const BRL_PREAPPROVAL_PLAN_EXAMPLE = {
+  reason: 'Atrevidos Premium',
+  auto_recurring: {
+    frequency: 1,
+    frequency_type: 'months' as const,
+    transaction_amount: 19.9,
+    currency_id: 'BRL' as const
+  }
+};
+
 export class MercadoPagoPaymentsAdapter implements PaymentsAdapter {
   readonly provider = 'mercadopago' as const;
 
-  constructor(
-    private readonly accessToken: string,
-    private readonly planId: string,
-    private readonly webhookSecret: string
-  ) {}
+  private readonly country: MercadoPagoCountry;
+  private readonly currency: 'BRL' | 'ARS';
+  private readonly backUrl: string;
+
+  constructor(private readonly config: MercadoPagoAdapterConfig) {
+    this.country = config.country ?? 'BR';
+    this.currency = config.currency ?? 'BRL';
+    this.backUrl =
+      config.backUrl ?? 'https://atrevido55.duckdns.org/subscription?checkout=return';
+  }
+
+  /** Moneda configurada para este adaptador (BRL en lanzamiento BR). */
+  get currencyId(): 'BRL' | 'ARS' {
+    return this.currency;
+  }
+
+  /** Portal de developers según país de la cuenta. */
+  get developerPortalUrl(): string {
+    return MERCADOPAGO_DEVELOPER_PORTALS[this.country];
+  }
 
   async createCheckoutSession(userId: string, userEmail: string): Promise<CheckoutSession> {
     const response = await fetch(`${MERCADOPAGO_API_BASE}/preapproval`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${this.accessToken}`,
+        Authorization: `Bearer ${this.config.accessToken}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        preapproval_plan_id: this.planId,
+        preapproval_plan_id: this.config.planId,
         payer_email: userEmail,
         external_reference: userId,
-        back_url: 'https://atrevido55.duckdns.org/subscription?checkout=return',
-        status: 'pending'
+        back_url: this.backUrl,
+        status: 'pending',
+        // El plan ya define currency_id (BRL/ARS); reason ayuda en el checkout MP.
+        reason: `Atrevidos Premium (${this.currency})`
       })
     });
 
     if (!response.ok) {
       const errorBody = await response.text();
-      throw new Error(`MercadoPago createCheckoutSession failed (${response.status}): ${errorBody}`);
+      throw new Error(
+        `MercadoPago createCheckoutSession failed (${response.status}, ${this.country}/${this.currency}): ${errorBody}`
+      );
     }
 
     const data = (await response.json()) as {
@@ -101,11 +151,11 @@ export class MercadoPagoPaymentsAdapter implements PaymentsAdapter {
   async verifyWebhook(rawBody: string, headers: Record<string, string>): Promise<WebhookVerificationResult> {
     // MercadoPago firma los webhooks con un header "x-signature" (HMAC-SHA256
     // sobre "id:{data.id};request-id:{x-request-id};ts:{ts};" usando el
-    // webhook secret). Documentación:
-    // https://www.mercadopago.com.ar/developers/es/docs/your-integrations/notifications/webhooks
+    // webhook secret). Documentación BR:
+    // https://www.mercadopago.com.br/developers/es/docs/your-integrations/notifications/webhooks
     const signatureHeader = headers['x-signature'];
 
-    if (!signatureHeader || !this.webhookSecret) {
+    if (!signatureHeader || !this.config.webhookSecret) {
       return { valid: false, reason: 'Falta x-signature o MERCADOPAGO_WEBHOOK_SECRET no configurado.' };
     }
 
@@ -132,7 +182,7 @@ export class MercadoPagoPaymentsAdapter implements PaymentsAdapter {
     }
 
     const detailResponse = await fetch(`${MERCADOPAGO_API_BASE}/preapproval/${preapprovalId}`, {
-      headers: { Authorization: `Bearer ${this.accessToken}` }
+      headers: { Authorization: `Bearer ${this.config.accessToken}` }
     });
 
     if (!detailResponse.ok) {

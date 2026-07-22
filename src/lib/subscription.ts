@@ -19,7 +19,9 @@ export function formatSubscriptionPeriodEnd(subscription: SubscriptionRow | null
     return '';
   }
 
-  return new Date(subscription.current_period_end).toLocaleDateString('es-AR', {
+  // Lanzamiento inicial en Brasil: locale pt-BR. Cambiar a es-AR cuando el
+  // operador esté en Argentina.
+  return new Date(subscription.current_period_end).toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: 'long',
     year: 'numeric'

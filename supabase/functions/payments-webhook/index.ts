@@ -1,22 +1,13 @@
 // Edge Function: payments-webhook
 //
-// Recibe las notificaciones del proveedor de pago (MercadoPago) y actualiza
-// el estado real de la suscripción en la tabla `subscriptions` usando el rol
-// service_role (necesario porque esa tabla no tiene policies de
-// INSERT/UPDATE para clientes, ver database/migrations/20260721_*).
+// Recibe las notificaciones del proveedor de pago (Mercado Pago Brasil) y
+// actualiza el estado real de la suscripción en la tabla `subscriptions`.
 //
-// verify_jwt = false: los webhooks de MercadoPago no llevan un JWT de
-// Supabase, llevan su propia firma HMAC en el header "x-signature". Por eso
-// esta función se despliega sin verificación de JWT y en cambio valida esa
-// firma manualmente contra MERCADOPAGO_WEBHOOK_SECRET.
+// verify_jwt = false: los webhooks de Mercado Pago no llevan JWT de Supabase,
+// llevan firma HMAC en "x-signature" (validar con MERCADOPAGO_WEBHOOK_SECRET).
 //
-// Estado actual: MERCADOPAGO_ACCESS_TOKEN / MERCADOPAGO_WEBHOOK_SECRET NO
-// están configurados todavía (pendiente de que el usuario cree la cuenta de
-// MercadoPago, ver src/lib/payments/mercadopago-adapter.ts). Mientras tanto
-// esta función responde 200 sin aplicar cambios reales y loguea el intento,
-// para que registrar la URL del webhook en MercadoPago no falle aunque el
-// modo mock siga siendo el que gestiona las suscripciones desde el cliente
-// (RPC start_mock_subscription_checkout / cancel_mock_subscription).
+// Lanzamiento inicial: Brasil (BRL). Ver docs/LANZAMIENTO-BR.md para CPF/CNPJ
+// y alta en developers.mercadopago.com.br (no se requiere CUIT argentino).
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 

@@ -5,7 +5,7 @@
     { label: 'Feed y matches', value: '100% activos' },
     { label: 'Chat en tiempo real', value: 'Sin demoras' },
     { label: 'Privacidad', value: 'Solo para logueados' },
-    { label: 'Lanzamiento', value: 'Argentina 🇦🇷 y Brasil 🇧🇷' }
+    { label: 'Lanzamiento', value: 'Brasil 🇧🇷 (beta)' }
   ];
 
   const features = [

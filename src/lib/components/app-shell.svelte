@@ -44,19 +44,28 @@
       icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
     }
   ];
+
+  const signOutIcon =
+    'M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V6a3 3 0 013-3h4a3 3 0 013 3v1';
 </script>
 
-<div class="min-h-screen bg-gray-50 dark:bg-dark-900">
+<div class="relative min-h-screen bg-dark-950 text-white">
+  <!-- Glow ambiental de fondo, mismo mood oscuro/sensual que /welcome -->
+  <div class="pointer-events-none fixed inset-0 overflow-hidden">
+    <div class="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-primary-700/20 blur-3xl"></div>
+    <div class="absolute -right-24 top-1/3 h-96 w-96 rounded-full bg-fuchsia-700/10 blur-3xl"></div>
+  </div>
+
   <!-- Sidebar: navegación fija estilo D4Swing/Sexlog (icono + etiqueta) -->
   <aside
-    class="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-gray-200 bg-white px-4 py-6 lg:flex dark:border-dark-700 dark:bg-dark-900"
+    class="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-white/5 bg-dark-950/80 px-4 py-6 backdrop-blur-xl lg:flex"
   >
     <a href="/" class="mb-8 flex items-center gap-2 px-2">
       <span
-        class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-lg font-bold text-white"
+        class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-lg font-bold text-white shadow-lg shadow-primary-500/30"
         >A</span
       >
-      <span class="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white">Atrevidos</span>
+      <span class="text-xl font-extrabold tracking-tight text-white">Atrevidos</span>
     </a>
 
     <nav class="flex flex-1 flex-col gap-1">
@@ -66,8 +75,8 @@
           aria-current={active === item.id ? 'page' : undefined}
           class={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
             active === item.id
-              ? 'bg-primary-50 text-primary-700 dark:bg-primary-950/40 dark:text-primary-300'
-              : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-dark-800'
+              ? 'bg-gradient-to-r from-primary-500/25 to-fuchsia-500/10 text-primary-300 ring-1 ring-primary-500/30 shadow-inner'
+              : 'text-gray-400 hover:bg-white/5 hover:text-gray-100'
           }`}
         >
           <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,52 +99,73 @@
     </a>
 
     {#if $auth.user?.email}
-      <p class="mb-2 truncate px-2 text-xs text-gray-400 dark:text-gray-500">{$auth.user.email}</p>
+      <p class="mb-2 truncate px-2 text-xs text-gray-500">{$auth.user.email}</p>
     {/if}
 
     <button
       type="button"
       on:click={() => onSignOut?.()}
       disabled={signingOut}
-      class="rounded-xl px-3 py-2 text-left text-sm font-medium text-gray-500 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-dark-800"
+      class="flex items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-medium text-gray-400 transition hover:bg-white/5 hover:text-rose-300 disabled:cursor-not-allowed disabled:opacity-50"
     >
+      <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={signOutIcon} />
+      </svg>
       {#if signingOut}Cerrando…{:else}Cerrar sesión{/if}
     </button>
   </aside>
 
   <!-- Barra superior para mobile (la sidebar se oculta bajo lg) -->
   <header
-    class="sticky top-0 z-30 flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 lg:hidden dark:border-dark-700 dark:bg-dark-900"
+    class="sticky top-0 z-30 flex items-center justify-between border-b border-white/5 bg-dark-950/90 px-4 py-3 backdrop-blur-xl lg:hidden"
   >
     <a href="/" class="flex items-center gap-2">
       <span
-        class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 text-sm font-bold text-white"
+        class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 text-sm font-bold text-white shadow-md shadow-primary-500/30"
         >A</span
       >
-      <span class="text-lg font-extrabold tracking-tight text-gray-900 dark:text-white">Atrevidos</span>
+      <span class="text-lg font-extrabold tracking-tight text-white">Atrevidos</span>
     </a>
-    <a
-      href="/subscription"
-      class="rounded-lg bg-gradient-to-r from-primary-500 to-fuchsia-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm"
-    >
-      Premium
-    </a>
+    <div class="flex items-center gap-2">
+      <a
+        href="/subscription"
+        class="rounded-lg bg-gradient-to-r from-primary-500 to-fuchsia-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm shadow-primary-500/30"
+      >
+        Premium
+      </a>
+      <button
+        type="button"
+        on:click={() => onSignOut?.()}
+        disabled={signingOut}
+        aria-label={signingOut ? 'Cerrando sesión…' : 'Cerrar sesión'}
+        title="Cerrar sesión"
+        class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-gray-400 transition hover:bg-white/10 hover:text-rose-300 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {#if signingOut}
+          <div class="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
+        {:else}
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={signOutIcon} />
+          </svg>
+        {/if}
+      </button>
+    </div>
   </header>
 
-  <div class="lg:pl-60">
+  <div class="relative z-10 lg:pl-60">
     <slot />
   </div>
 
   <!-- Nav inferior para mobile -->
   <nav
-    class="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between border-t border-gray-200 bg-white px-2 py-1.5 lg:hidden dark:border-dark-700 dark:bg-dark-900"
+    class="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between border-t border-white/5 bg-dark-950/90 px-2 py-1.5 backdrop-blur-xl lg:hidden"
   >
     {#each navItems as item (item.id)}
       <a
         href={item.href}
         aria-current={active === item.id ? 'page' : undefined}
         class={`flex flex-1 flex-col items-center gap-0.5 rounded-lg px-1 py-1.5 text-[11px] font-semibold transition ${
-          active === item.id ? 'text-primary-600 dark:text-primary-300' : 'text-gray-500 dark:text-gray-400'
+          active === item.id ? 'text-primary-400' : 'text-gray-500'
         }`}
       >
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

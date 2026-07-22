@@ -355,12 +355,12 @@
 </script>
 
 <AppShell active="matches" onSignOut={handleSignOut} {signingOut}>
-<div class="min-h-screen bg-gray-50 px-4 py-6 dark:bg-dark-900">
+<div class="px-4 py-6">
   <div class="mx-auto max-w-6xl space-y-6">
     <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Tus matches</h1>
-        <p class="mt-2 max-w-3xl text-sm text-gray-600 dark:text-gray-400">
+        <h1 class="text-3xl font-bold text-white">Tus matches</h1>
+        <p class="mt-2 max-w-3xl text-sm text-gray-400">
           Aquí aparecen los likes mutuos. Atrevidos intenta preparar el chat directo automáticamente para que puedas abrirlo
           desde aquí o desde tu bandeja cuando ya esté disponible.
         </p>
@@ -376,11 +376,11 @@
       </button>
     </header>
 
-    <section class="rounded-2xl bg-white p-5 shadow-lg dark:bg-dark-800">
+    <section class="rounded-2xl p-5 shadow-lg bg-dark-800">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">A quién le gustás</h2>
-          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <h2 class="text-lg font-semibold text-white">A quién le gustás</h2>
+          <p class="mt-1 text-sm text-gray-400">
             Personas que ya te dieron like o super-like, antes de que sea match mutuo.
           </p>
         </div>
@@ -395,32 +395,32 @@
       </div>
 
       {#if !hasActiveSubscription}
-        <div class="mt-4 flex items-center gap-3 rounded-xl bg-gray-50 px-4 py-4 dark:bg-dark-900">
+        <div class="mt-4 flex items-center gap-3 rounded-xl px-4 py-4 bg-dark-900">
           <div class="flex -space-x-2">
             {#each { length: 3 } as _, i}
-              <div class="h-10 w-10 rounded-full border-2 border-white bg-gray-300 blur-sm dark:border-dark-800 dark:bg-dark-600"></div>
+              <div class="h-10 w-10 rounded-full border-2 blur-sm border-dark-800 bg-dark-600"></div>
             {/each}
           </div>
-          <p class="text-sm text-gray-600 dark:text-gray-400">
+          <p class="text-sm text-gray-400">
             Suscribite a Atrevidos Premium para ver quién te dio like antes de que sea match.
           </p>
         </div>
       {:else if incomingLikes.length === 0}
-        <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">Todavía nadie te dio like. ¡Completá tu perfil para destacar!</p>
+        <p class="mt-4 text-sm text-gray-400">Todavía nadie te dio like. ¡Completá tu perfil para destacar!</p>
       {:else}
         <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {#each incomingLikes as like (like.id)}
-            <div class="flex items-center gap-3 rounded-xl bg-gray-50 px-3 py-3 dark:bg-dark-900">
+            <div class="flex items-center gap-3 rounded-xl px-3 py-3 bg-dark-900">
               {#if like.avatarUrl}
                 <img src={like.avatarUrl} alt={like.displayName} class="h-10 w-10 rounded-full object-cover" />
               {:else}
-                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 font-bold text-primary-700 dark:bg-primary-950/50 dark:text-primary-300">
+                <div class="flex h-10 w-10 items-center justify-center rounded-full font-bold bg-primary-950/50 text-primary-300">
                   {(like.displayName.trim()[0] || 'U').toUpperCase()}
                 </div>
               {/if}
               <div class="min-w-0">
-                <p class="truncate text-sm font-semibold text-gray-900 dark:text-white">{like.displayName}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
+                <p class="truncate text-sm font-semibold text-white">{like.displayName}</p>
+                <p class="text-xs text-gray-400">
                   {like.matchType === 'super-like' ? '⭐ Te dio un super-like' : 'Te dio like'}
                 </p>
               </div>
@@ -431,24 +431,24 @@
     </section>
 
     {#if blockFeedback}
-      <section class="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700 shadow-sm dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-300">
+      <section class="rounded-2xl border px-5 py-4 text-sm shadow-sm border-emerald-900 bg-emerald-950/30 text-emerald-300">
         <p>{blockFeedback}</p>
       </section>
     {/if}
 
     {#if loading}
-      <section class="rounded-2xl bg-white px-6 py-12 text-center shadow-lg dark:bg-gray-800">
+      <section class="rounded-2xl px-6 py-12 text-center shadow-lg bg-gray-800">
         <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
-        <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Buscando matches mutuos…</p>
+        <p class="mt-4 text-sm text-gray-400">Buscando matches mutuos…</p>
       </section>
     {:else if loadError}
-      <section class="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700 shadow-sm dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
+      <section class="rounded-2xl border px-5 py-4 text-sm shadow-sm border-red-900 bg-red-950/30 text-red-300">
         <p>{loadError}</p>
       </section>
     {:else if matches.length === 0}
-      <section class="rounded-2xl bg-white px-6 py-12 text-center shadow-lg dark:bg-gray-800">
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Aún no hay matches mutuos</h2>
-        <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+      <section class="rounded-2xl px-6 py-12 text-center shadow-lg bg-gray-800">
+        <h2 class="text-xl font-semibold text-white">Aún no hay matches mutuos</h2>
+        <p class="mt-3 text-sm text-gray-400">
           Cuando dos personas se den like entre sí, aparecerán aquí y podrán pasar a la bandeja de mensajes.
         </p>
         <a
@@ -461,7 +461,7 @@
     {:else}
       <section class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         {#each matches as match (match.id)}
-          <article class="overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
+          <article class="overflow-hidden rounded-2xl shadow-lg ring-1 bg-gray-800 ring-gray-700">
             <div class="h-24 bg-gradient-to-r from-primary-500 via-fuchsia-500 to-rose-500"></div>
 
             <div class="px-5 pb-5">
@@ -470,15 +470,15 @@
                   <img
                     src={match.avatarUrl}
                     alt={match.displayName}
-                    class="h-20 w-20 rounded-2xl border-4 border-white object-cover shadow-md dark:border-gray-800"
+                    class="h-20 w-20 rounded-2xl border-4 object-cover shadow-md border-gray-800"
                   />
                 {:else}
-                  <div class="flex h-20 w-20 items-center justify-center rounded-2xl border-4 border-white bg-primary-100 text-2xl font-bold text-primary-600 shadow-md dark:border-gray-800 dark:bg-primary-900 dark:text-primary-300">
+                  <div class="flex h-20 w-20 items-center justify-center rounded-2xl border-4 text-2xl font-bold shadow-md border-gray-800 bg-primary-900 text-primary-300">
                     {(match.displayName.trim()[0] || 'U').toUpperCase()}
                   </div>
                 {/if}
 
-                <span class="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300">
+                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-emerald-950/50 text-emerald-300">
                   Match mutuo
                 </span>
               </div>
@@ -486,30 +486,30 @@
               <div class="mt-4 space-y-4">
                 <div>
                   <div class="flex flex-wrap items-center gap-2">
-                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{match.displayName}</h2>
-                    <span class="text-sm text-gray-500 dark:text-gray-400">@{match.username}</span>
+                    <h2 class="text-xl font-semibold text-white">{match.displayName}</h2>
+                    <span class="text-sm text-gray-400">@{match.username}</span>
                   </div>
-                  <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{match.location || 'Ubicación no indicada'}</p>
-                  <p class="mt-2 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  <p class="mt-1 text-sm text-gray-400">{match.location || 'Ubicación no indicada'}</p>
+                  <p class="mt-2 text-xs font-medium uppercase tracking-wide text-gray-400">
                     Match desde {formatMatchedDate(match.matchedAt)}
                   </p>
                 </div>
 
                 <div class="flex flex-wrap gap-2">
-                  <span class="inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700 dark:bg-primary-950/50 dark:text-primary-200">
+                  <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-primary-950/50 text-primary-200">
                     {match.relationshipIntent
                       ? relationshipIntentLabels.get(match.relationshipIntent) ?? 'Sin definir'
                       : 'Sin definir'}
                   </span>
 
                   {#each match.interests as interest (interest)}
-                    <span class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-900 dark:text-gray-200">
+                    <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-gray-900 text-gray-200">
                       #{interest}
                     </span>
                   {/each}
                 </div>
 
-                <div class={`rounded-2xl px-4 py-4 text-sm ${match.hasConversation ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-200' : 'bg-primary-50 text-primary-800 dark:bg-primary-950/30 dark:text-primary-200'}`}>
+                <div class={`rounded-2xl px-4 py-4 text-sm ${match.hasConversation ? 'bg-emerald-950/30 text-emerald-200' : 'bg-primary-950/30 text-primary-200'}`}>
                   {#if match.hasConversation}
                     <p class="font-semibold">Chat listo para abrir.</p>
                     <p class="mt-1">
@@ -526,7 +526,7 @@
                 <div class="grid gap-3 sm:grid-cols-2">
                   <a
                     href={match.conversationId ? `/messages/${match.conversationId}` : '/messages'}
-                    class="inline-flex w-full items-center justify-center rounded-xl border border-primary-300 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-50 dark:border-primary-700 dark:text-primary-300 dark:hover:bg-primary-950/30"
+                    class="inline-flex w-full items-center justify-center rounded-xl border px-4 py-3 text-sm font-semibold transition border-primary-700 text-primary-300 hover:bg-primary-950/30"
                   >
                     {match.hasConversation ? 'Abrir chat' : 'Ir a mensajes'}
                   </a>
@@ -535,7 +535,7 @@
                     type="button"
                     on:click={() => blockMatch(match)}
                     disabled={blockLoadingByUser[match.matchedUserId]}
-                    class="inline-flex w-full items-center justify-center rounded-xl border border-rose-300 px-4 py-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-rose-800 dark:text-rose-300 dark:hover:bg-rose-950/30"
+                    class="inline-flex w-full items-center justify-center rounded-xl border px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 border-rose-800 text-rose-300 hover:bg-rose-950/30"
                   >
                     {#if blockLoadingByUser[match.matchedUserId]}Bloqueando…{:else}Bloquear{/if}
                   </button>

@@ -170,7 +170,7 @@
   >
     <div
       bind:this={dialogElement}
-      class="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700"
+      class="w-full max-w-lg rounded-3xl p-6 shadow-2xl ring-1 bg-gray-800 ring-gray-700"
       role="dialog"
       aria-modal="true"
       aria-labelledby="report-modal-title"
@@ -179,11 +179,11 @@
     >
       <div class="flex items-start justify-between gap-4">
         <div>
-          <p class="text-sm font-medium text-rose-600 dark:text-rose-300">Seguridad de la comunidad</p>
-          <h2 id="report-modal-title" class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+          <p class="text-sm font-medium text-rose-300">Seguridad de la comunidad</p>
+          <h2 id="report-modal-title" class="mt-1 text-2xl font-bold text-white">
             Reportar {target.label || 'contenido'}
           </h2>
-          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          <p class="mt-2 text-sm text-gray-400">
             Cuéntanos qué pasó. Tu reporte se enviará para revisión.
           </p>
         </div>
@@ -192,7 +192,7 @@
           type="button"
           on:click={closeModal}
           disabled={submitting}
-          class="rounded-full p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+          class="rounded-full p-2 transition disabled:cursor-not-allowed disabled:opacity-50 text-gray-400 hover:bg-gray-700 hover:text-white"
           aria-label="Cerrar"
         >
           ✕
@@ -201,7 +201,7 @@
 
       <form class="mt-6 space-y-4" on:submit|preventDefault={submitReport}>
         <div>
-          <label for="report-category" class="mb-2 block text-sm font-semibold text-gray-900 dark:text-white">
+          <label for="report-category" class="mb-2 block text-sm font-semibold text-white">
             Motivo del reporte
           </label>
           <select
@@ -211,7 +211,7 @@
             disabled={submitting}
             required
             aria-invalid={submitError && !category ? 'true' : undefined}
-            class="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+            class="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 disabled:cursor-not-allowed disabled:opacity-60 border-gray-600 bg-gray-900 text-white"
           >
             <option value="">Selecciona una opción</option>
             {#each REPORT_CATEGORY_OPTIONS as option}
@@ -221,7 +221,7 @@
         </div>
 
         <div>
-          <label for="report-reason" class="mb-2 block text-sm font-semibold text-gray-900 dark:text-white">
+          <label for="report-reason" class="mb-2 block text-sm font-semibold text-white">
             Cuéntanos un poco más
           </label>
           <textarea
@@ -233,14 +233,14 @@
             required
             aria-invalid={submitError && !reason.trim() ? 'true' : undefined}
             placeholder="Ej. Está enviando insultos o compartiendo contenido ofensivo."
-            class="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+            class="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 disabled:cursor-not-allowed disabled:opacity-60 border-gray-600 bg-gray-900 text-white"
           ></textarea>
-          <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{reason.trim().length}/{MAX_REPORT_REASON_LENGTH} caracteres</p>
+          <p class="mt-2 text-xs text-gray-400">{reason.trim().length}/{MAX_REPORT_REASON_LENGTH} caracteres</p>
         </div>
 
         {#if submitError}
           <p
-            class="rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:bg-red-950/30 dark:text-red-300"
+            class="rounded-2xl px-4 py-3 text-sm font-medium bg-red-950/30 text-red-300"
             role="alert"
             aria-live="polite"
           >
@@ -253,7 +253,7 @@
             type="button"
             on:click={closeModal}
             disabled={submitting}
-            class="inline-flex items-center justify-center rounded-2xl border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+            class="inline-flex items-center justify-center rounded-2xl border px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 border-gray-600 text-gray-200 hover:bg-gray-700"
           >
             Cancelar
           </button>

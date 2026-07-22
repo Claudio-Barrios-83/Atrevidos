@@ -318,12 +318,12 @@
 </script>
 
 <AppShell active="discover" onSignOut={handleSignOut} {signingOut}>
-<div class="min-h-screen bg-gray-50 px-4 py-6 dark:bg-dark-900">
+<div class="px-4 py-6">
   <div class="mx-auto max-w-6xl space-y-6">
     <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Descubrir personas</h1>
-        <p class="mt-2 max-w-2xl text-sm text-gray-600 dark:text-gray-400">
+        <h1 class="text-3xl font-bold text-white">Descubrir personas</h1>
+        <p class="mt-2 max-w-2xl text-sm text-gray-400">
           Explora perfiles activos y encuentra personas cerca de ti o con intereses similares.
         </p>
       </div>
@@ -349,22 +349,22 @@
     </header>
 
     {#if actionSuccessMessage}
-      <section class="rounded-2xl bg-emerald-50 px-4 py-4 text-sm font-medium text-emerald-700 shadow-sm dark:bg-emerald-950/30 dark:text-emerald-300">
+      <section class="rounded-2xl px-4 py-4 text-sm font-medium shadow-sm bg-emerald-950/30 text-emerald-300">
         <p>{actionSuccessMessage}</p>
       </section>
     {/if}
 
-    <section class="rounded-2xl bg-white p-4 shadow-lg dark:bg-gray-800 sm:p-5">
+    <section class="rounded-2xl p-4 shadow-lg sm:p-5 bg-gray-800">
       <div class="flex items-center justify-between gap-3">
         <div>
-          <p class="text-sm font-semibold text-gray-900 dark:text-white">Filtros rápidos</p>
-          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{visibleCount} perfiles visibles</p>
+          <p class="text-sm font-semibold text-white">Filtros rápidos</p>
+          <p class="mt-1 text-xs text-gray-400">{visibleCount} perfiles visibles</p>
         </div>
 
         <button
           type="button"
           on:click={resetFilters}
-          class="text-sm font-medium text-primary-600 transition hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+          class="text-sm font-medium transition text-primary-400 hover:text-primary-300"
         >
           Limpiar
         </button>
@@ -372,7 +372,7 @@
 
       <div class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div>
-          <label for="location-filter" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+          <label for="location-filter" class="mb-2 block text-sm font-medium text-white">
             Ciudad o zona
           </label>
           <input
@@ -381,12 +381,12 @@
             bind:value={filters.location}
             on:input={applyFilters}
             placeholder="Ej. Madrid"
-            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+            class="w-full rounded-xl border px-4 py-3 text-sm outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 border-gray-600 bg-gray-900 text-white"
           />
         </div>
 
         <div>
-          <label for="interest-filter" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+          <label for="interest-filter" class="mb-2 block text-sm font-medium text-white">
             Interés
           </label>
           <input
@@ -396,7 +396,7 @@
             bind:value={filters.interest}
             on:input={applyFilters}
             placeholder="Ej. café"
-            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+            class="w-full rounded-xl border px-4 py-3 text-sm outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 border-gray-600 bg-gray-900 text-white"
           />
           <datalist id="discover-interests">
             {#each interestOptions as interest}
@@ -406,14 +406,14 @@
         </div>
 
         <div>
-          <label for="intent-filter" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+          <label for="intent-filter" class="mb-2 block text-sm font-medium text-white">
             Intención
           </label>
           <select
             id="intent-filter"
             bind:value={filters.relationshipIntent}
             on:change={applyFilters}
-            class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+            class="w-full rounded-xl border px-4 py-3 text-sm outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 border-gray-600 bg-gray-900 text-white"
           >
             <option value="">Todas</option>
             {#each RELATIONSHIP_INTENT_OPTIONS as option}
@@ -422,12 +422,12 @@
           </select>
         </div>
 
-        <label class="flex items-center gap-3 rounded-2xl bg-gray-50 px-4 py-3 text-sm text-gray-700 dark:bg-gray-900 dark:text-gray-200">
+        <label class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm bg-gray-900 text-gray-200">
           <input
             type="checkbox"
             bind:checked={filters.onlineRecentlyOnly}
             on:change={applyFilters}
-            class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            class="h-4 w-4 rounded border-gray-600 bg-dark-900 text-primary-600 focus:ring-primary-500"
           />
           Solo en línea recientemente
         </label>
@@ -435,25 +435,25 @@
     </section>
 
     {#if loadError}
-      <section class="rounded-2xl bg-red-50 px-4 py-5 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">
+      <section class="rounded-2xl px-4 py-5 text-sm bg-red-950/30 text-red-300">
         <p>{loadError}</p>
       </section>
     {:else if loading}
-      <section class="rounded-2xl bg-white px-4 py-12 text-center shadow-lg dark:bg-gray-800">
+      <section class="rounded-2xl px-4 py-12 text-center shadow-lg bg-gray-800">
         <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
-        <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Buscando perfiles para ti…</p>
+        <p class="mt-4 text-sm text-gray-400">Buscando perfiles para ti…</p>
       </section>
     {:else if visibleCount === 0 && allProfiles.length > 0}
-      <section class="rounded-2xl bg-white px-4 py-10 text-center shadow-lg dark:bg-gray-800">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">No encontramos coincidencias con esos filtros</h2>
-        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+      <section class="rounded-2xl px-4 py-10 text-center shadow-lg bg-gray-800">
+        <h2 class="text-lg font-semibold text-white">No encontramos coincidencias con esos filtros</h2>
+        <p class="mt-2 text-sm text-gray-400">
           Prueba otra ciudad, interés o quita el filtro de actividad reciente.
         </p>
       </section>
     {:else if allProfiles.length === 0}
-      <section class="rounded-2xl bg-white px-4 py-10 text-center shadow-lg dark:bg-gray-800">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Todavía no hay perfiles para descubrir</h2>
-        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+      <section class="rounded-2xl px-4 py-10 text-center shadow-lg bg-gray-800">
+        <h2 class="text-lg font-semibold text-white">Todavía no hay perfiles para descubrir</h2>
+        <p class="mt-2 text-sm text-gray-400">
           Cuando más personas completen su perfil, aparecerán aquí automáticamente.
         </p>
       </section>

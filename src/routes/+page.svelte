@@ -629,16 +629,16 @@
 <AppShell active="feed" onSignOut={handleSignOut} {signingOut}>
 <div class="mx-auto max-w-2xl px-4 py-8">
   <header class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Tu feed</h1>
-    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Lo que comparte la comunidad de Atrevidos, en tiempo real.</p>
+    <h1 class="bg-gradient-to-r from-primary-400 to-fuchsia-400 bg-clip-text text-2xl font-extrabold text-transparent">Tu feed</h1>
+    <p class="mt-1 text-sm text-gray-400">Lo que comparte la comunidad de Atrevidos, en tiempo real.</p>
   </header>
 
-  <div class="mb-6 flex gap-1 rounded-xl bg-gray-100 p-1 dark:bg-dark-800">
+  <div class="mb-6 flex gap-1 rounded-xl bg-white/5 p-1 ring-1 ring-white/10">
     <button
       type="button"
       on:click={() => (activeTab = 'todos')}
       class={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition ${
-        activeTab === 'todos' ? 'bg-white text-primary-700 shadow dark:bg-dark-700 dark:text-primary-300' : 'text-gray-500 dark:text-gray-400'
+        activeTab === 'todos' ? 'bg-gradient-to-r from-primary-500/25 to-fuchsia-500/10 text-primary-300 shadow-inner ring-1 ring-primary-500/20' : 'text-gray-400 hover:text-gray-200'
       }`}
     >
       Todos
@@ -647,7 +647,7 @@
       type="button"
       on:click={() => (activeTab = 'mias')}
       class={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition ${
-        activeTab === 'mias' ? 'bg-white text-primary-700 shadow dark:bg-dark-700 dark:text-primary-300' : 'text-gray-500 dark:text-gray-400'
+        activeTab === 'mias' ? 'bg-gradient-to-r from-primary-500/25 to-fuchsia-500/10 text-primary-300 shadow-inner ring-1 ring-primary-500/20' : 'text-gray-400 hover:text-gray-200'
       }`}
     >
       Mis publicaciones
@@ -655,19 +655,19 @@
   </div>
 
   {#if sessionError}
-    <p class="mb-6 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">
+    <p class="mb-6 rounded-lg px-3 py-2 text-sm bg-red-950/40 text-red-300">
       {sessionError}
     </p>
   {/if}
 
   {#if reactionError}
-    <p class="mb-6 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">
+    <p class="mb-6 rounded-lg px-3 py-2 text-sm bg-red-950/40 text-red-300">
       {reactionError}
     </p>
   {/if}
 
   {#if reportFeedback}
-    <p class="mb-6 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+    <p class="mb-6 rounded-lg px-3 py-2 text-sm bg-emerald-950/40 text-emerald-300">
       {reportFeedback}
     </p>
   {/if}
@@ -679,8 +679,8 @@
   {:else if feedError}
     <ErrorState message={feedError} retry={loadPosts} />
   {:else if visiblePosts.length === 0}
-    <div class="rounded-xl bg-gray-50 py-12 text-center dark:bg-gray-800">
-      <p class="text-gray-500 dark:text-gray-400">
+    <div class="rounded-2xl bg-white/5 py-12 text-center ring-1 ring-white/10">
+      <p class="text-gray-400">
         {#if activeTab === 'mias'}
           Todavía no publicaste nada. ¡Compartí algo desde el cuadro de arriba!
         {:else}

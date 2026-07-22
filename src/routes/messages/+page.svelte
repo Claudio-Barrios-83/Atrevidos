@@ -408,12 +408,12 @@
 </script>
 
 <AppShell active="messages" onSignOut={handleSignOut} {signingOut}>
-<div class="min-h-screen bg-gray-50 px-4 py-6 dark:bg-dark-900">
+<div class="px-4 py-6">
   <div class="mx-auto max-w-5xl space-y-6">
     <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Mensajes</h1>
-        <p class="mt-2 max-w-3xl text-sm text-gray-600 dark:text-gray-400">
+        <h1 class="text-3xl font-bold text-white">Mensajes</h1>
+        <p class="mt-2 max-w-3xl text-sm text-gray-400">
           Esta bandeja solo muestra conversaciones directas con matches mutuos. Los bloqueos y conversaciones fuera de
           match quedan ocultos para mantener la privacidad.
         </p>
@@ -423,7 +423,7 @@
         <button
           type="button"
           on:click={openCreateGroupForm}
-          class="inline-flex items-center justify-center rounded-xl border border-primary-300 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-50 dark:border-primary-800 dark:text-primary-300 dark:hover:bg-primary-950/30"
+          class="inline-flex items-center justify-center rounded-xl border px-4 py-3 text-sm font-semibold transition border-primary-800 text-primary-300 hover:bg-primary-950/30"
         >
           + Nuevo grupo
         </button>
@@ -439,51 +439,51 @@
     </header>
 
     {#if showCreateGroupForm}
-      <section class="rounded-2xl bg-white p-5 shadow-lg ring-1 ring-primary-200 dark:bg-gray-800 dark:ring-primary-900">
+      <section class="rounded-2xl p-5 shadow-lg ring-1 bg-gray-800 ring-primary-900">
         <div class="flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Crear grupo</h2>
-          <button type="button" on:click={closeCreateGroupForm} class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400">
+          <h2 class="text-lg font-semibold text-white">Crear grupo</h2>
+          <button type="button" on:click={closeCreateGroupForm} class="text-sm text-gray-400 hover:text-white">
             Cerrar
           </button>
         </div>
 
-        <label class="mt-4 block text-sm font-medium text-gray-900 dark:text-white" for="group-name">Nombre del grupo</label>
+        <label class="mt-4 block text-sm font-medium text-white" for="group-name">Nombre del grupo</label>
         <input
           id="group-name"
           type="text"
           bind:value={groupNameDraft}
           maxlength="80"
           placeholder="Ej. Amigos de la playa"
-          class="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+          class="mt-2 w-full rounded-xl border px-4 py-3 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 border-gray-600 bg-gray-900 text-white"
         />
 
-        <p class="mt-4 text-sm font-medium text-gray-900 dark:text-white">
+        <p class="mt-4 text-sm font-medium text-white">
           Elegí al menos 2 matches mutuos ({selectedGroupMemberIds.size} seleccionados)
         </p>
 
         {#if mutualMatchOptions.length === 0}
-          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <p class="mt-2 text-sm text-gray-400">
             Todavía no tenés matches mutuos para armar un grupo. Conseguí algunos en Descubrir.
           </p>
         {:else}
           <div class="mt-2 max-h-64 space-y-2 overflow-y-auto">
             {#each mutualMatchOptions as match (match.matchedUserId)}
-              <label class="flex items-center gap-3 rounded-xl border border-gray-200 p-3 dark:border-gray-700">
+              <label class="flex items-center gap-3 rounded-xl border p-3 border-gray-700">
                 <input
                   type="checkbox"
                   checked={selectedGroupMemberIds.has(match.matchedUserId)}
                   on:change={() => toggleGroupMemberSelection(match.matchedUserId)}
-                  class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  class="h-4 w-4 rounded border-gray-600 bg-dark-900 text-primary-600 focus:ring-primary-500"
                 />
-                <span class="text-sm font-medium text-gray-900 dark:text-white">{match.displayName}</span>
-                <span class="text-xs text-gray-500 dark:text-gray-400">@{match.username}</span>
+                <span class="text-sm font-medium text-white">{match.displayName}</span>
+                <span class="text-xs text-gray-400">@{match.username}</span>
               </label>
             {/each}
           </div>
         {/if}
 
         {#if createGroupError}
-          <p class="mt-3 text-sm text-red-600 dark:text-red-300">{createGroupError}</p>
+          <p class="mt-3 text-sm text-red-300">{createGroupError}</p>
         {/if}
 
         <button
@@ -499,29 +499,29 @@
 
     {#if groups.length > 0}
       <section class="space-y-3">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Grupos</h2>
+        <h2 class="text-lg font-semibold text-white">Grupos</h2>
         {#each groups as group (group.id)}
           <a
             href={`/messages/group/${group.id}`}
-            class="flex items-center gap-4 rounded-2xl bg-white p-4 shadow-lg ring-1 ring-gray-200 transition hover:ring-primary-300 dark:bg-gray-800 dark:ring-gray-700"
+            class="flex items-center gap-4 rounded-2xl p-4 shadow-lg ring-1 transition hover:ring-primary-300 bg-gray-800 ring-gray-700"
           >
             {#if group.avatarUrl}
               <img src={group.avatarUrl} alt={group.name} class="h-12 w-12 rounded-2xl object-cover" />
             {:else}
-              <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-fuchsia-100 text-lg font-bold text-fuchsia-600 dark:bg-fuchsia-950/40 dark:text-fuchsia-300">
+              <div class="flex h-12 w-12 items-center justify-center rounded-2xl text-lg font-bold bg-fuchsia-950/40 text-fuchsia-300">
                 👥
               </div>
             {/if}
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">
-                <h3 class="truncate text-sm font-semibold text-gray-900 dark:text-white">{group.name}</h3>
+                <h3 class="truncate text-sm font-semibold text-white">{group.name}</h3>
                 {#if group.unreadCount > 0}
                   <span class="inline-flex items-center rounded-full bg-primary-600 px-2 py-0.5 text-xs font-semibold text-white">
                     {group.unreadCount}
                   </span>
                 {/if}
               </div>
-              <p class="truncate text-xs text-gray-500 dark:text-gray-400">
+              <p class="truncate text-xs text-gray-400">
                 {group.lastMessagePreview || 'Aún no hay mensajes en este grupo.'}
               </p>
             </div>
@@ -531,18 +531,18 @@
     {/if}
 
     {#if loading}
-      <section class="rounded-2xl bg-white px-6 py-12 text-center shadow-lg dark:bg-gray-800">
+      <section class="rounded-2xl px-6 py-12 text-center shadow-lg bg-gray-800">
         <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
-        <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Cargando conversaciones visibles…</p>
+        <p class="mt-4 text-sm text-gray-400">Cargando conversaciones visibles…</p>
       </section>
     {:else if loadError}
-      <section class="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700 shadow-sm dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
+      <section class="rounded-2xl border px-5 py-4 text-sm shadow-sm border-red-900 bg-red-950/30 text-red-300">
         <p>{loadError}</p>
       </section>
     {:else if conversations.length === 0}
-      <section class="rounded-2xl bg-white px-6 py-12 text-center shadow-lg dark:bg-gray-800">
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Tu bandeja está vacía</h2>
-        <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+      <section class="rounded-2xl px-6 py-12 text-center shadow-lg bg-gray-800">
+        <h2 class="text-xl font-semibold text-white">Tu bandeja está vacía</h2>
+        <p class="mt-3 text-sm text-gray-400">
           Tus conversaciones directas con matches mutuos aparecerán aquí en cuanto estén listas para abrirse.
         </p>
         <a
@@ -555,7 +555,7 @@
     {:else}
       <section class="space-y-4">
         {#each conversations as conversation (conversation.conversationId)}
-          <article class="rounded-2xl bg-white p-5 shadow-lg ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
+          <article class="rounded-2xl p-5 shadow-lg ring-1 bg-gray-800 ring-gray-700">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div class="flex min-w-0 items-center gap-4">
                 {#if conversation.counterpartAvatarUrl}
@@ -565,17 +565,17 @@
                     class="h-14 w-14 rounded-2xl object-cover shadow-sm"
                   />
                 {:else}
-                  <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-100 text-lg font-bold text-primary-600 dark:bg-primary-900 dark:text-primary-300">
+                  <div class="flex h-14 w-14 items-center justify-center rounded-2xl text-lg font-bold bg-primary-900 text-primary-300">
                     {(conversation.counterpartName.trim()[0] || 'U').toUpperCase()}
                   </div>
                 {/if}
 
                 <div class="min-w-0 flex-1">
                   <div class="flex flex-wrap items-center gap-2">
-                    <h2 class="truncate text-lg font-semibold text-gray-900 dark:text-white">
+                    <h2 class="truncate text-lg font-semibold text-white">
                       {conversation.counterpartName}
                     </h2>
-                    <span class="truncate text-sm text-gray-500 dark:text-gray-400">
+                    <span class="truncate text-sm text-gray-400">
                       @{conversation.counterpartUsername}
                     </span>
                     {#if conversation.unreadCount > 0}
@@ -585,20 +585,20 @@
                     {/if}
                   </div>
 
-                  <p class="mt-2 line-clamp-2 text-sm text-gray-600 dark:text-gray-300">
+                  <p class="mt-2 line-clamp-2 text-sm text-gray-300">
                     {formatMessagePreview(conversation)}
                   </p>
                 </div>
               </div>
 
               <div class="flex shrink-0 flex-col items-start gap-3 sm:items-end">
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <p class="text-xs font-medium uppercase tracking-wide text-gray-400">
                   {formatLastActivity(conversation.lastActivityAt)}
                 </p>
 
                 <a
                   href={`/messages/${conversation.conversationId}`}
-                  class="inline-flex items-center justify-center rounded-xl border border-primary-300 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-50 dark:border-primary-700 dark:text-primary-300 dark:hover:bg-primary-950/30"
+                  class="inline-flex items-center justify-center rounded-xl border px-4 py-3 text-sm font-semibold transition border-primary-700 text-primary-300 hover:bg-primary-950/30"
                 >
                   Abrir chat
                 </a>

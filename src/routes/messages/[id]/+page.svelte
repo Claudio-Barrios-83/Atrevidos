@@ -606,20 +606,20 @@
   });
 </script>
 
-<div class="min-h-screen bg-gray-50 px-4 py-6 dark:bg-gray-900">
+<div class="min-h-screen bg-dark-950 px-4 py-6">
   <div class="mx-auto max-w-4xl space-y-6">
-    <header class="flex flex-col gap-4 rounded-3xl bg-white p-5 shadow-lg ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700 sm:flex-row sm:items-center sm:justify-between">
+    <header class="flex flex-col gap-4 rounded-3xl p-5 shadow-lg ring-1 sm:flex-row sm:items-center sm:justify-between bg-gray-800 ring-gray-700">
       <div class="min-w-0">
         <div class="flex flex-wrap items-center gap-3 text-sm font-medium">
           <a
             href="/messages"
-            class="text-primary-600 transition hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+            class="transition text-primary-400 hover:text-primary-300"
           >
             ← Volver a mensajes
           </a>
           <a
             href="/matches"
-            class="text-primary-600 transition hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+            class="transition text-primary-400 hover:text-primary-300"
           >
             Matches
           </a>
@@ -634,22 +634,22 @@
                 class="h-16 w-16 rounded-2xl object-cover shadow-sm"
               />
             {:else}
-              <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-100 text-xl font-bold text-primary-600 dark:bg-primary-900 dark:text-primary-300">
+              <div class="flex h-16 w-16 items-center justify-center rounded-2xl text-xl font-bold bg-primary-900 text-primary-300">
                 {getInitials(conversation.counterpartName)}
               </div>
             {/if}
 
             <div class="min-w-0">
-              <h1 class="truncate text-2xl font-bold text-gray-900 dark:text-white">
+              <h1 class="truncate text-2xl font-bold text-white">
                 {conversation.counterpartName}
               </h1>
-              <p class="truncate text-sm text-gray-500 dark:text-gray-400">@{conversation.counterpartUsername}</p>
+              <p class="truncate text-sm text-gray-400">@{conversation.counterpartUsername}</p>
             </div>
           </div>
         {:else}
           <div class="mt-4">
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Chat directo</h1>
-            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            <h1 class="text-2xl font-bold text-white">Chat directo</h1>
+            <p class="mt-2 text-sm text-gray-400">
               Carga una conversación directa existente para ver el historial y enviar mensajes.
             </p>
           </div>
@@ -671,7 +671,7 @@
             type="button"
             on:click={blockConversationCounterpart}
             disabled={blockingConversation}
-            class="inline-flex items-center justify-center rounded-xl border border-rose-300 px-4 py-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-rose-800 dark:text-rose-300 dark:hover:bg-rose-950/30"
+            class="inline-flex items-center justify-center rounded-xl border px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 border-rose-800 text-rose-300 hover:bg-rose-950/30"
           >
             {#if blockingConversation}Bloqueando…{:else}Bloquear a {conversation.counterpartName}{/if}
           </button>
@@ -680,30 +680,30 @@
     </header>
 
     {#if loading}
-      <section class="rounded-3xl bg-white px-6 py-12 text-center shadow-lg dark:bg-gray-800">
+      <section class="rounded-3xl px-6 py-12 text-center shadow-lg bg-gray-800">
         <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
-        <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Cargando conversación…</p>
+        <p class="mt-4 text-sm text-gray-400">Cargando conversación…</p>
       </section>
     {:else if loadError}
-      <section class="rounded-3xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700 shadow-sm dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
+      <section class="rounded-3xl border px-5 py-4 text-sm shadow-sm border-red-900 bg-red-950/30 text-red-300">
         <p>{loadError}</p>
       </section>
     {:else if conversation}
       <section class="space-y-4">
         {#if reportFeedback}
-          <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 shadow-sm dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-300">
+          <div class="rounded-2xl border px-4 py-3 text-sm shadow-sm border-emerald-900 bg-emerald-950/30 text-emerald-300">
             {reportFeedback}
           </div>
         {/if}
 
         <div
           bind:this={timelineElement}
-          class="max-h-[60vh] space-y-3 overflow-y-auto rounded-3xl bg-white p-5 shadow-lg ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700"
+          class="max-h-[60vh] space-y-3 overflow-y-auto rounded-3xl p-5 shadow-lg ring-1 bg-gray-800 ring-gray-700"
         >
           {#if messageItems.length === 0}
-            <div class="rounded-2xl border border-dashed border-gray-300 px-5 py-8 text-center dark:border-gray-600">
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Aún no hay mensajes</h2>
-              <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            <div class="rounded-2xl border border-dashed px-5 py-8 text-center border-gray-600">
+              <h2 class="text-lg font-semibold text-white">Aún no hay mensajes</h2>
+              <p class="mt-2 text-sm text-gray-400">
                 Rompe el hielo con tu primer mensaje. Cuando lleguen nuevas respuestas, el chat intentará actualizarlas en
                 tiempo real.
               </p>
@@ -712,10 +712,10 @@
             {#each messageItems as message (message.id)}
               <div class={`flex ${message.isOwnMessage ? 'justify-end' : 'justify-start'}`}>
                 <article
-                  class={`max-w-[85%] rounded-3xl px-4 py-3 shadow-sm ${message.isOwnMessage ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100'}`}
+                  class={`max-w-[85%] rounded-3xl px-4 py-3 shadow-sm ${message.isOwnMessage ? 'bg-primary-600 text-white' : 'bg-gray-900 text-gray-100'}`}
                 >
                   <div class="flex items-start justify-between gap-3">
-                    <p class={`text-xs font-semibold uppercase tracking-wide ${message.isOwnMessage ? 'text-primary-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                    <p class={`text-xs font-semibold uppercase tracking-wide ${message.isOwnMessage ? 'text-primary-100' : 'text-gray-400'}`}>
                       {message.isOwnMessage ? 'Tú' : conversation.counterpartName}
                     </p>
 
@@ -725,7 +725,7 @@
                       disabled={message.isOwnMessage}
                       aria-label={message.isOwnMessage ? 'No puedes reportarte a ti misma/o.' : 'Reportar este mensaje'}
                       title={message.isOwnMessage ? 'No puedes reportarte a ti misma/o.' : 'Reportar este mensaje'}
-                      class={`shrink-0 text-xs font-semibold transition ${message.isOwnMessage ? 'cursor-not-allowed text-primary-200/70 opacity-70' : 'text-rose-600 hover:text-rose-700 dark:text-rose-300 dark:hover:text-rose-200'}`}
+                      class={`shrink-0 text-xs font-semibold transition ${message.isOwnMessage ? 'cursor-not-allowed text-primary-200/70 opacity-70' : 'text-rose-300 hover:text-rose-200'}`}
                     >
                       Reportar
                     </button>
@@ -749,7 +749,7 @@
                   {:else if !message.mediaUrl}
                     <p class="mt-2 whitespace-pre-wrap text-sm leading-6 italic opacity-80">Mensaje vacío</p>
                   {/if}
-                  <p class={`mt-3 text-[11px] ${message.isOwnMessage ? 'text-primary-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                  <p class={`mt-3 text-[11px] ${message.isOwnMessage ? 'text-primary-100' : 'text-gray-400'}`}>
                     {formatTimestamp(message.createdAt)}
                   </p>
                 </article>
@@ -759,17 +759,17 @@
         </div>
 
         <form
-          class="rounded-3xl bg-white p-5 shadow-lg ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700"
+          class="rounded-3xl p-5 shadow-lg ring-1 bg-gray-800 ring-gray-700"
           on:submit|preventDefault={sendMessage}
         >
-          <label for="message-draft" class="text-sm font-semibold text-gray-900 dark:text-white">Escribe un mensaje</label>
+          <label for="message-draft" class="text-sm font-semibold text-white">Escribe un mensaje</label>
           <textarea
             id="message-draft"
             bind:value={draft}
             rows="4"
             maxlength="2000"
             placeholder="Escribe algo bonito…"
-            class="mt-3 w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-200 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:focus:border-primary-400 dark:focus:ring-primary-900"
+            class="mt-3 w-full rounded-2xl border px-4 py-3 text-sm shadow-sm outline-none transition focus:ring-2 border-gray-600 bg-gray-900 text-white focus:border-primary-400 focus:ring-primary-900"
           ></textarea>
 
           <input
@@ -782,14 +782,14 @@
           />
 
           {#if selectedMediaPreviewUrl}
-            <div class="mt-3 flex items-center gap-3 rounded-2xl border border-dashed border-gray-300 p-3 dark:border-gray-600">
+            <div class="mt-3 flex items-center gap-3 rounded-2xl border border-dashed p-3 border-gray-600">
               <img src={selectedMediaPreviewUrl} alt="Vista previa" class="h-16 w-16 rounded-xl object-cover" />
-              <div class="flex-1 text-xs text-gray-500 dark:text-gray-400">{selectedMediaFile?.name}</div>
+              <div class="flex-1 text-xs text-gray-400">{selectedMediaFile?.name}</div>
               <button
                 type="button"
                 on:click={clearSelectedMedia}
                 disabled={sending}
-                class="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-900/60 dark:text-red-300 dark:hover:bg-red-950/30"
+                class="rounded-lg border px-3 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 border-red-900/60 text-red-300 hover:bg-red-950/30"
               >
                 Quitar
               </button>
@@ -797,7 +797,7 @@
           {/if}
 
           {#if mediaError}
-            <p class="mt-2 text-xs text-red-600 dark:text-red-300">{mediaError}</p>
+            <p class="mt-2 text-xs text-red-300">{mediaError}</p>
           {/if}
 
           <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -806,16 +806,16 @@
                 type="button"
                 on:click={() => mediaInput?.click()}
                 disabled={sending}
-                class="inline-flex items-center gap-2 rounded-xl border border-gray-300 px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
+                class="inline-flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 border-gray-600 text-gray-200 hover:bg-gray-800"
               >
                 📷 Imagen
               </button>
 
               <div class="space-y-1 text-sm" aria-live="polite">
                 {#if sendError}
-                  <p class="text-red-600 dark:text-red-300">{sendError}</p>
+                  <p class="text-red-300">{sendError}</p>
                 {:else if sendSuccess}
-                  <p class="text-emerald-600 dark:text-emerald-300">{sendSuccess}</p>
+                  <p class="text-emerald-300">{sendSuccess}</p>
                 {/if}
               </div>
             </div>

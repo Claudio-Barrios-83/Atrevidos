@@ -26,7 +26,12 @@ export default {
 					600: '#475569',
 					700: '#334155',
 					800: '#1e293b',
-					900: '#0f172a'
+					900: '#0f172a',
+					// Tono extra, más profundo, de la misma escala "dark" ya
+					// definida (equivalente a slate-950). Se usa como fondo base
+					// de las pantallas autenticadas para llevar el mismo mood
+					// oscuro/sensual que ya tenía la landing pública (/welcome).
+					950: '#020617'
 				}
 			}
 		}

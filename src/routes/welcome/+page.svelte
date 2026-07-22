@@ -1,4 +1,6 @@
 <script lang="ts">
+  import heroImage from '$lib/assets/landing-hero-sensual.png';
+
   const highlights = [
     { label: 'Feed y matches', value: '100% activos' },
     { label: 'Chat en tiempo real', value: 'Sin demoras' },
@@ -45,18 +47,31 @@
 
   <!-- Hero -->
   <section class="relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-primary-900/40 via-dark-900 to-dark-900"></div>
+    <!-- Imagen artística de fondo (silueta editorial, sin contenido explícito),
+         con capas de gradiente encima para que el texto siga siendo 100%
+         legible sobre cualquier parte de la foto. -->
+    <img
+      src={heroImage}
+      alt="Pareja abrazada en una silueta artística con iluminación dramática rosa y violeta"
+      class="absolute inset-0 h-full w-full object-cover object-center opacity-60"
+      loading="eager"
+      fetchpriority="high"
+    />
+    <div class="absolute inset-0 bg-gradient-to-b from-dark-900/70 via-dark-900/85 to-dark-900"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-dark-900 via-dark-900/40 to-dark-900/80"></div>
+    <div class="absolute inset-0 bg-gradient-to-br from-primary-900/30 via-transparent to-fuchsia-900/20"></div>
+
     <div class="relative mx-auto max-w-4xl px-4 py-20 text-center sm:py-28">
       <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold uppercase tracking-wide text-amber-300 ring-1 ring-amber-500/30">
         Solo para mayores de 18 años
       </span>
 
-      <h1 class="mt-6 text-4xl font-extrabold leading-tight tracking-tight sm:text-6xl">
+      <h1 class="mt-6 text-4xl font-extrabold leading-tight tracking-tight drop-shadow-lg sm:text-6xl">
         Conectá con libertad,
         <span class="bg-gradient-to-r from-primary-400 to-fuchsia-400 bg-clip-text text-transparent">sin filtros de nadie más.</span>
       </h1>
 
-      <p class="mx-auto mt-6 max-w-2xl text-lg text-gray-300">
+      <p class="mx-auto mt-6 max-w-2xl text-lg text-gray-200 drop-shadow-md">
         Atrevidos es la red social pensada para parejas y personas liberales que buscan conexiones reales, con
         privacidad de verdad: nadie ve nada sin iniciar sesión.
       </p>
@@ -70,17 +85,17 @@
         </a>
         <a
           href="/login"
-          class="inline-flex w-full items-center justify-center rounded-xl border border-gray-600 px-8 py-4 text-base font-semibold text-white transition hover:bg-white/10 sm:w-auto"
+          class="inline-flex w-full items-center justify-center rounded-xl border border-gray-500 bg-dark-900/40 px-8 py-4 text-base font-semibold text-white backdrop-blur-sm transition hover:bg-white/10 sm:w-auto"
         >
           Ya tengo cuenta
         </a>
       </div>
 
-      <div class="mx-auto mt-16 grid grid-cols-2 gap-6 border-t border-white/10 pt-10 sm:grid-cols-4">
+      <div class="mx-auto mt-16 grid grid-cols-2 gap-6 rounded-2xl border-t border-white/10 bg-dark-900/30 p-6 pt-10 backdrop-blur-sm sm:grid-cols-4">
         {#each highlights as item}
           <div>
             <p class="text-xl font-extrabold text-primary-400 sm:text-2xl">{item.value}</p>
-            <p class="mt-1 text-xs text-gray-400 sm:text-sm">{item.label}</p>
+            <p class="mt-1 text-xs text-gray-300 sm:text-sm">{item.label}</p>
           </div>
         {/each}
       </div>

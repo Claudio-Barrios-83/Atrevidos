@@ -346,11 +346,11 @@
 </script>
 
 <AppShell active="profile" onSignOut={handleSignOut} {signingOut}>
-<div class="min-h-screen bg-gray-50 px-4 py-6 dark:bg-dark-900">
+<div class="px-4 py-6">
   <div class="mx-auto max-w-2xl space-y-6">
     <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 class="text-3xl font-bold text-white">
           {editing ? 'Editar perfil' : 'Mi perfil'}
         </h1>
       </div>
@@ -367,13 +367,13 @@
     </header>
 
     {#if saveSuccess}
-      <div class="rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300">
+      <div class="rounded-2xl px-4 py-3 text-sm font-medium bg-emerald-950/30 text-emerald-300">
         {saveSuccess}
       </div>
     {/if}
 
     {#if saveError}
-      <div class="rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:bg-red-950/30 dark:text-red-300">
+      <div class="rounded-2xl px-4 py-3 text-sm font-medium bg-red-950/30 text-red-300">
         {saveError}
       </div>
     {/if}
@@ -385,8 +385,8 @@
     {:else if profile}
       <!-- ═══════ AVATAR ═══════ -->
       {@const p = profile}
-      <section class="rounded-2xl bg-white p-5 shadow-lg ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Foto de perfil</h2>
+      <section class="rounded-2xl p-5 shadow-lg ring-1 bg-gray-800 ring-gray-700">
+        <h2 class="text-lg font-semibold text-white">Foto de perfil</h2>
 
         {#if editing}
           <div class="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:items-start">
@@ -405,17 +405,17 @@
               {:else if resolvedAvatarUrl}
                 <img src={resolvedAvatarUrl} alt="Avatar actual" class="h-28 w-28 rounded-2xl object-cover shadow-md" />
               {:else}
-                <div class="flex h-28 w-28 items-center justify-center rounded-2xl bg-primary-100 text-3xl font-bold text-primary-600 shadow-md dark:bg-primary-900 dark:text-primary-300">
+                <div class="flex h-28 w-28 items-center justify-center rounded-2xl text-3xl font-bold shadow-md bg-primary-900 text-primary-300">
                   {(profile.display_name || profile.username || 'U').trim()[0].toUpperCase()}
                 </div>
               {/if}
             </div>
 
             <div class="flex flex-col gap-3">
-              <p class="text-sm text-gray-600 dark:text-gray-400">
+              <p class="text-sm text-gray-400">
                 JPG, PNG o WEBP · máx. {MAX_AVATAR_IMAGE_BYTES / (1024 * 1024)} MB
               </p>
-              <label class="inline-flex cursor-pointer items-center justify-center rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800">
+              <label class="inline-flex cursor-pointer items-center justify-center rounded-xl border px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 border-gray-600 text-gray-200 hover:bg-gray-800">
                 <span>{avatarFile ? 'Cambiar foto' : 'Subir foto'}</span>
                 <input type="file" accept={PROFILE_IMAGE_ACCEPT} class="hidden" disabled={saving} on:change={handleAvatarChange} />
               </label>
@@ -426,7 +426,7 @@
             {#if resolvedAvatarUrl}
               <img src={resolvedAvatarUrl} alt="Avatar" class="h-28 w-28 rounded-2xl object-cover shadow-md" />
             {:else}
-              <div class="flex h-28 w-28 items-center justify-center rounded-2xl bg-primary-100 text-3xl font-bold text-primary-600 shadow-md dark:bg-primary-900 dark:text-primary-300">
+              <div class="flex h-28 w-28 items-center justify-center rounded-2xl text-3xl font-bold shadow-md bg-primary-900 text-primary-300">
                 {(profile.display_name || profile.username || 'U').trim()[0].toUpperCase()}
               </div>
             {/if}
@@ -435,11 +435,11 @@
       </section>
 
       <!-- ═══════ GALERÍA ═══════ -->
-      <section class="rounded-2xl bg-white p-5 shadow-lg ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
+      <section class="rounded-2xl p-5 shadow-lg ring-1 bg-gray-800 ring-gray-700">
         <div class="flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Galería</h2>
+          <h2 class="text-lg font-semibold text-white">Galería</h2>
           {#if editing}
-            <p class="text-xs text-gray-500 dark:text-gray-400">
+            <p class="text-xs text-gray-400">
               {((profile.gallery_urls ?? []).length + galleryFiles.length)}/{MAX_PROFILE_GALLERY_IMAGES}
             </p>
           {/if}
@@ -460,7 +460,7 @@
               type="button"
               on:click={() => galleryInput?.click()}
               disabled={saving || getRemainingSlots() === 0}
-              class="inline-flex items-center justify-center rounded-xl border border-dashed border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-800"
+              class="inline-flex items-center justify-center rounded-xl border border-dashed px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 border-gray-600 text-gray-400 hover:bg-gray-800"
             >
               {#if getRemainingSlots() === 0}
                 Límite alcanzado
@@ -468,7 +468,7 @@
                 + Añadir foto{getRemainingSlots() > 1 ? 's' : ''}
               {/if}
             </button>
-            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            <p class="mt-2 text-xs text-gray-400">
               JPG, PNG o WEBP · máx. {MAX_GALLERY_IMAGE_BYTES / (1024 * 1024)} MB c/u
             </p>
           </div>
@@ -476,7 +476,7 @@
 
         <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {#each (profile.gallery_urls ?? []) as url, index}
-            <div class="group relative overflow-hidden rounded-xl bg-gray-100 shadow-sm dark:bg-gray-900">
+            <div class="group relative overflow-hidden rounded-xl shadow-sm bg-gray-900">
               <img
                 src={resolvedGalleryUrls[index] || url}
                 alt={`Foto de galería ${index + 1}`}
@@ -497,7 +497,7 @@
             </div>
           {/each}
           {#each galleryFiles as item (item.id)}
-            <div class="group relative overflow-hidden rounded-xl bg-gray-100 shadow-sm dark:bg-gray-900">
+            <div class="group relative overflow-hidden rounded-xl shadow-sm bg-gray-900">
               <img src={item.previewUrl} alt="Nueva foto" class="h-36 w-full object-cover" />
               <button
                 type="button"
@@ -514,8 +514,8 @@
             </div>
           {/each}
           {#if (profile.gallery_urls ?? []).length === 0 && galleryFiles.length === 0}
-            <div class="col-span-full rounded-xl border border-dashed border-gray-300 px-5 py-8 text-center dark:border-gray-600">
-              <p class="text-sm text-gray-500 dark:text-gray-400">
+            <div class="col-span-full rounded-xl border border-dashed px-5 py-8 text-center border-gray-600">
+              <p class="text-sm text-gray-400">
                 {editing ? 'Aún no has añadido fotos a tu galería.' : 'Sin fotos en la galería.'}
               </p>
             </div>
@@ -525,75 +525,75 @@
 
       <!-- ═══════ INFORMACIÓN ═══════ -->
       {#if editing}
-        <section class="rounded-2xl bg-white p-5 shadow-lg ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Información del perfil</h2>
+        <section class="rounded-2xl p-5 shadow-lg ring-1 bg-gray-800 ring-gray-700">
+          <h2 class="text-lg font-semibold text-white">Información del perfil</h2>
           <form class="mt-4 space-y-5" on:submit|preventDefault={handleSave}>
             <div class="grid gap-5 sm:grid-cols-2">
               <div class="sm:col-span-2">
-                <label for="edit-username" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Nombre de usuario</label>
+                <label for="edit-username" class="mb-2 block text-sm font-medium text-white">Nombre de usuario</label>
                 <input
                   id="edit-username" type="text" required minlength="3" maxlength="30"
                   bind:value={form.username}
                   on:input={() => { form.username = normalizeUsername(form.username); }}
                   disabled={saving}
-                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                  class="w-full rounded-xl border px-4 py-3 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 border-gray-600 bg-gray-900 text-white"
                   placeholder="tu_nombre"
                 />
               </div>
 
               <div class="sm:col-span-2">
-                <label for="edit-displayName" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Nombre visible</label>
+                <label for="edit-displayName" class="mb-2 block text-sm font-medium text-white">Nombre visible</label>
                 <input
                   id="edit-displayName" type="text" required maxlength="80"
                   bind:value={form.displayName}
                   disabled={saving}
-                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                  class="w-full rounded-xl border px-4 py-3 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 border-gray-600 bg-gray-900 text-white"
                   placeholder="Cómo quieres que te vean"
                 />
               </div>
 
               <div class="sm:col-span-2">
-                <label for="edit-bio" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Biografía</label>
+                <label for="edit-bio" class="mb-2 block text-sm font-medium text-white">Biografía</label>
                 <textarea
                   id="edit-bio" required rows="4" maxlength="280"
                   bind:value={form.bio}
                   disabled={saving}
-                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                  class="w-full rounded-xl border px-4 py-3 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 border-gray-600 bg-gray-900 text-white"
                   placeholder="Cuéntanos algo sobre ti"
                 ></textarea>
-                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{form.bio.trim().length}/280 caracteres</p>
+                <p class="mt-1 text-xs text-gray-400">{form.bio.trim().length}/280 caracteres</p>
               </div>
 
               <div>
-                <label for="edit-location" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Ubicación</label>
+                <label for="edit-location" class="mb-2 block text-sm font-medium text-white">Ubicación</label>
                 <input
                   id="edit-location" type="text" required maxlength="120"
                   bind:value={form.location}
                   disabled={saving}
-                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                  class="w-full rounded-xl border px-4 py-3 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 border-gray-600 bg-gray-900 text-white"
                   placeholder="Ciudad, país"
                 />
               </div>
 
               <div>
-                <label for="edit-interests" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">Intereses</label>
+                <label for="edit-interests" class="mb-2 block text-sm font-medium text-white">Intereses</label>
                 <input
                   id="edit-interests" type="text" required
                   bind:value={form.interests}
                   disabled={saving}
-                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                  class="w-full rounded-xl border px-4 py-3 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 border-gray-600 bg-gray-900 text-white"
                   placeholder="música, viajes, café"
                 />
-                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Sepáralos con comas.</p>
+                <p class="mt-1 text-xs text-gray-400">Sepáralos con comas.</p>
               </div>
 
               <div class="sm:col-span-2">
-                <label for="edit-relationshipIntent" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">¿Qué buscas en Atrevidos?</label>
+                <label for="edit-relationshipIntent" class="mb-2 block text-sm font-medium text-white">¿Qué buscas en Atrevidos?</label>
                 <select
                   id="edit-relationshipIntent" required
                   bind:value={form.relationshipIntent}
                   disabled={saving}
-                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                  class="w-full rounded-xl border px-4 py-3 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 border-gray-600 bg-gray-900 text-white"
                 >
                   <option value="">Selecciona una opción</option>
                   {#each RELATIONSHIP_INTENT_OPTIONS as option}
@@ -603,14 +603,14 @@
               </div>
 
               <div class="sm:col-span-2">
-                <label for="edit-relationshipPreferences" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                <label for="edit-relationshipPreferences" class="mb-2 block text-sm font-medium text-white">
                   Preferencias de conexión <span class="text-gray-400">(opcional)</span>
                 </label>
                 <textarea
                   id="edit-relationshipPreferences" rows="3" maxlength="200"
                   bind:value={form.relationshipPreferences}
                   disabled={saving}
-                  class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                  class="w-full rounded-xl border px-4 py-3 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-60 border-gray-600 bg-gray-900 text-white"
                   placeholder="Por ejemplo: me gustan las conversaciones tranquilas"
                 ></textarea>
               </div>
@@ -621,7 +621,7 @@
                 type="button"
                 on:click={cancelEditing}
                 disabled={saving}
-                class="inline-flex items-center justify-center rounded-xl border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
+                class="inline-flex items-center justify-center rounded-xl border px-5 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 border-gray-600 text-gray-200 hover:bg-gray-800"
               >
                 Cancelar
               </button>
@@ -645,40 +645,40 @@
         </section>
       {:else}
         <!-- ═══════ VIEW MODE ═══════ -->
-        <section class="rounded-2xl bg-white p-5 shadow-lg ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+        <section class="rounded-2xl p-5 shadow-lg ring-1 bg-gray-800 ring-gray-700">
+          <h2 class="text-lg font-semibold text-white">
             {profile.display_name || profile.username || 'Usuario'}
           </h2>
-          <p class="text-sm text-gray-500 dark:text-gray-400">@{profile.username}</p>
+          <p class="text-sm text-gray-400">@{profile.username}</p>
 
           <div class="mt-5 space-y-4">
             {#if profile.bio}
               <div>
-                <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Biografía</h3>
-                <p class="mt-1 whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200">{profile.bio}</p>
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-400">Biografía</h3>
+                <p class="mt-1 whitespace-pre-wrap text-sm text-gray-200">{profile.bio}</p>
               </div>
             {/if}
 
             <div class="grid gap-4 sm:grid-cols-2">
               {#if profile.location}
                 <div>
-                  <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Ubicación</h3>
-                  <p class="mt-1 text-sm text-gray-800 dark:text-gray-200">{profile.location}</p>
+                  <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-400">Ubicación</h3>
+                  <p class="mt-1 text-sm text-gray-200">{profile.location}</p>
                 </div>
               {/if}
 
               {#if profile.interests && profile.interests.length > 0}
                 <div>
-                  <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Intereses</h3>
-                  <p class="mt-1 text-sm text-gray-800 dark:text-gray-200">{formatInterestsDisplay(profile.interests)}</p>
+                  <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-400">Intereses</h3>
+                  <p class="mt-1 text-sm text-gray-200">{formatInterestsDisplay(profile.interests)}</p>
                 </div>
               {/if}
             </div>
 
             {#if profile.relationship_intent}
               <div>
-                <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Intención</h3>
-                <p class="mt-1 text-sm text-gray-800 dark:text-gray-200">
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-400">Intención</h3>
+                <p class="mt-1 text-sm text-gray-200">
                   {RELATIONSHIP_INTENT_OPTIONS.find((o) => o.value === p.relationship_intent)?.label ?? p.relationship_intent}
                 </p>
               </div>
@@ -686,17 +686,17 @@
 
             {#if profile.relationship_preferences}
               <div>
-                <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Preferencias</h3>
-                <p class="mt-1 whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200">{profile.relationship_preferences}</p>
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-400">Preferencias</h3>
+                <p class="mt-1 whitespace-pre-wrap text-sm text-gray-200">{profile.relationship_preferences}</p>
               </div>
             {/if}
           </div>
         </section>
       {/if}
     {:else}
-      <div class="rounded-2xl bg-white px-6 py-12 text-center shadow-lg dark:bg-gray-800">
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Perfil no encontrado</h2>
-        <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">No pudimos encontrar tu perfil. Intenta completar el onboarding primero.</p>
+      <div class="rounded-2xl px-6 py-12 text-center shadow-lg bg-gray-800">
+        <h2 class="text-xl font-semibold text-white">Perfil no encontrado</h2>
+        <p class="mt-3 text-sm text-gray-400">No pudimos encontrar tu perfil. Intenta completar el onboarding primero.</p>
         <a href="/onboarding" class="mt-6 inline-flex items-center justify-center rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-700">Ir al onboarding</a>
       </div>
     {/if}

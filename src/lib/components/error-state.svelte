@@ -3,8 +3,8 @@
   export let retry: (() => void) | undefined = undefined;
 </script>
 
-<div class="rounded-xl bg-red-50 p-6 text-center shadow-sm dark:bg-red-950/30 border border-red-100 dark:border-red-900/50">
-  <p class="text-sm text-red-700 dark:text-red-300">{message}</p>
+<div class="rounded-xl p-6 text-center shadow-sm border bg-red-950/30 border-red-900/50">
+  <p class="text-sm text-red-300">{message}</p>
   {#if retry}
     <button
       type="button"

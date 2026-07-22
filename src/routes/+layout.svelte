@@ -108,27 +108,23 @@
 </script>
 
 {#if shouldShowShellLoader}
-  <div class="flex min-h-screen items-center justify-center bg-gray-50 px-4 text-center text-gray-600 dark:bg-gray-900 dark:text-gray-300">
+  <div class="flex min-h-screen items-center justify-center bg-dark-950 px-4 text-center text-gray-300">
     <div>
       <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent"></div>
       <p class="mt-4 text-sm font-medium">Preparando tu sesión…</p>
     </div>
   </div>
 {:else}
-  {#if $auth.user}
-    <button
-    onclick={async () => {
-      try {
-        await auth.signOut();
-      } catch (err) {
-        console.error('Logout failed:', err);
-        alert('No se pudo cerrar sesión');
-      }
-    }}
-    class="fixed right-4 top-4 rounded bg-red-500 p-2 text-white transition hover:bg-red-600"
-  >
-    Cerrar sesión
-  </button>
-  {/if}
+  <!--
+    Nota: antes había aquí un botón de "Cerrar sesión" flotante (fixed
+    right-4 top-4, sin z-index) que se renderizaba por encima de TODA la app
+    en cada página autenticada. Se solapaba visualmente con otros botones de
+    esa misma esquina (p. ej. el botón "Premium" del header mobile en
+    AppShell) y competía con el verdadero botón de cerrar sesión del sidebar,
+    lo que causaba el bug reportado de botones "encimados" que no respondían
+    bien al hacer click. El cierre de sesión real ahora vive únicamente en
+    AppShell (sidebar de escritorio + header mobile), correctamente
+    integrado en el layout en vez de superpuesto con position:fixed.
+  -->
   <slot />
 {/if}

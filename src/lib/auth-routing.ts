@@ -26,6 +26,12 @@ export function decideAuthRedirect({
     return '/welcome';
   }
 
+  // Anónimo en /onboarding (p. ej. justo después de cerrar sesión): nunca
+  // quedarse ahí esperando una sesión que ya no existe. Preferimos la landing.
+  if (!isAuthenticated && pathname === '/onboarding') {
+    return '/welcome';
+  }
+
   if (isAuthenticated && pathname === '/welcome') {
     return requiresOnboarding ? '/onboarding' : '/';
   }

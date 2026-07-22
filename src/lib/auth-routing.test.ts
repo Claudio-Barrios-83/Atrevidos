@@ -20,6 +20,10 @@ describe('decideAuthRedirect', () => {
     expect(decide({ pathname: '/', isAuthenticated: false })).toBe('/welcome');
   });
 
+  it('redirects anonymous users away from /onboarding to the public landing', () => {
+    expect(decide({ pathname: '/onboarding', isAuthenticated: false })).toBe('/welcome');
+  });
+
   it('allows anonymous users to stay on /login', () => {
     expect(decide({ pathname: '/login', isAuthenticated: false })).toBeNull();
   });

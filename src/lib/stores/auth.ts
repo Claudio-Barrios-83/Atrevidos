@@ -119,6 +119,12 @@ function createAuthStore(): AuthStore {
 
 			const { error } = await supabase.auth.signOut();
 
+			// Limpiamos el store de forma explícita (no confiamos solo en
+			// onAuthStateChange): si el evento llega tarde o no dispara, el
+			// layout seguiría creyendo que hay sesión y puede redirigir a
+			// /onboarding con un estado stale.
+			updateState(null, { loading: false, initialized: true });
+
 			if (error) {
 				throw error;
 			}

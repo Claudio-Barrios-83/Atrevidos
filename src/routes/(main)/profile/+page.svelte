@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { supabase } from '$lib/supabase/client';
   import { auth } from '$lib';
+  import { signOutToWelcome } from '$lib/sign-out';
   import {
     uploadAvatarImage,
     uploadGalleryImage,
@@ -36,7 +37,7 @@
     if (signingOut) return;
     signingOut = true;
     try {
-      await auth.signOut();
+      await signOutToWelcome();
     } finally {
       signingOut = false;
     }

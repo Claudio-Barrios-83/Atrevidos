@@ -1,5 +1,6 @@
 <script lang="ts">
   import { auth } from '$lib';
+  import { signOutToWelcome } from '$lib/sign-out';
   import {
     buildConversationListItems,
     finalizeConversationListItems,
@@ -51,7 +52,7 @@
     if (signingOut) return;
     signingOut = true;
     try {
-      await auth.signOut();
+      await signOutToWelcome();
     } finally {
       signingOut = false;
     }

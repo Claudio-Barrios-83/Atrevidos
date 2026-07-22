@@ -1,5 +1,6 @@
 <script lang="ts">
   import { auth } from '$lib';
+  import { signOutToWelcome } from '$lib/sign-out';
   import { supabase } from '$lib/supabase/client';
   import { resolveStorageImageUrl } from '$lib/supabase/profile-media';
   import {
@@ -109,7 +110,7 @@
     if (signingOut) return;
     signingOut = true;
     try {
-      await auth.signOut();
+      await signOutToWelcome();
     } finally {
       signingOut = false;
     }

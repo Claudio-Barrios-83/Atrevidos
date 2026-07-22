@@ -35,6 +35,7 @@
   } from '$lib/reactions';
   import { saveDiscoverMatch } from '$lib/discover-actions';
   import { auth } from '$lib';
+  import { signOutToWelcome } from '$lib/sign-out';
   import ReportModal from '$lib/components/report-modal.svelte';
   import PostComposer from '$lib/components/post-composer.svelte';
   import PostCard from '$lib/components/post-card.svelte';
@@ -453,7 +454,7 @@
     signingOut = true;
 
     try {
-      await auth.signOut();
+      await signOutToWelcome();
     } catch (error) {
       console.error('Error signing out:', error);
       sessionError = 'No pudimos cerrar tu sesión. Inténtalo de nuevo.';

@@ -26,8 +26,15 @@
   $: onboardingReadyForRouting = !authState.user || onboardingCheckedKey === currentOnboardingKey || onboardingStatus === 'error';
   $: shouldShowShellLoader =
     browser &&
-    (!authState.initialized || redirecting || (!!authState.user && onboardingLoading && !onboardingReadyForRouting));
+    (!authState.initialized ||
+      redirecting ||
+      // Solo esperamos onboarding si HAY sesión. Sin usuario nunca hay que
+      // quedarse en el spinner por un check de onboarding en vuelo.
+      (!!authState.user && onboardingLoading && !onboardingReadyForRouting));
 
+  // Tras un logout el onboardingStatus previo ('complete'/'incomplete') no
+  // debe influir: sin usuario siempre reseteamos a 'unknown' y dejamos que
+  // decideAuthRedirect mande a /welcome o /login (nunca a /onboarding).
   $: if (browser && authState.initialized) {
     const user = authState.user;
     const currentKey = currentOnboardingKey;
@@ -55,10 +62,13 @@
   }
 
   $: if (browser && authState.initialized && onboardingReadyForRouting) {
+    // Sin sesión, el estado de onboarding no aplica: forzamos 'unknown' en la
+    // decisión para no heredar un 'incomplete' stale que mande a /onboarding.
+    const statusForRedirect = authState.user ? onboardingStatus : 'unknown';
     const redirectTarget = decideAuthRedirect({
       pathname,
       isAuthenticated: !!authState.user,
-      onboardingStatus
+      onboardingStatus: statusForRedirect
     });
 
     if (redirectTarget && !redirecting) {

@@ -1,0 +1,101 @@
+# ============================================================================
+# ATREVIDOS - CI/CD: build & publish de la imagen Docker a GHCR
+# ============================================================================
+# Qué hace este workflow:
+#   1. En cada push a "main", construye la imagen Docker de la app (mismo
+#      Dockerfile multi-stage que se usa para el build local) pasando las
+#      mismas variables PUBLIC_/VITE_ que hoy se pasan como build-args desde
+#      docker-compose.yml (ver comentarios en Dockerfile: son variables
+#      públicas que Vite/SvelteKit inlinean en el bundle del navegador, no
+#      son secretas, pero deben existir en tiempo de build).
+#   2. Publica la imagen resultante en GitHub Container Registry (GHCR) con
+#      dos tags: "latest" (la que consume Watchtower en el servidor) y el
+#      SHA del commit (para poder rastrear/rollback a una build específica).
+#
+# Por qué así:
+#   - El servidor de producción NO hace build desde el código fuente para
+#     cada deploy: Watchtower solo vigila imágenes Docker y las actualiza
+#     cuando cambian en el registry. Por eso el build tiene que pasar por
+#     acá (GitHub Actions) y no en el servidor.
+#   - Se usa el GITHUB_TOKEN automático que Actions genera en cada run para
+#     autenticar contra GHCR (permissions.packages: write más abajo). No
+#     hace falta crear ni configurar ningún Personal Access Token (PAT).
+#
+# Pasos manuales pendientes (uno de los pasos NO puede hacerlo este workflow
+# ni un agente con acceso solo al servidor; los debe hacer un humano en la
+# UI de GitHub):
+#   a) Crear en este repo, en Settings -> Secrets and variables -> Actions,
+#      los 4 secrets (mismos nombres exactos usados abajo en env/build-args):
+#        PUBLIC_SUPABASE_URL
+#        PUBLIC_SUPABASE_ANON_KEY
+#        VITE_SUPABASE_URL
+#        VITE_SUPABASE_ANON_KEY
+#      con los mismos valores que ya están en el .env del servidor.
+#   b) Después del primer build exitoso, ir a la página del paquete GHCR
+#      (github.com -> perfil/organización -> Packages -> "atrevidos") y
+#      cambiar su visibilidad a "Public" (Package settings -> Change
+#      visibility), para que el servidor pueda hacer "docker pull" sin
+#      necesitar credenciales de docker login. Ver README/estado del deploy
+#      para más detalle.
+# ============================================================================
+
+name: Build y publicar imagen Docker en GHCR
+
+on:
+  push:
+    branches:
+      - main
+
+# Necesario para poder hacer push de la imagen a GitHub Container Registry
+# usando el GITHUB_TOKEN automático del workflow (sin PAT).
+permissions:
+  contents: read
+  packages: write
+
+env:
+  # GHCR exige nombres de imagen en minúsculas. El propietario del repo
+  # (Claudio-Barrios-83) tiene mayúsculas, por eso lo normalizamos abajo.
+  REGISTRY: ghcr.io
+  IMAGE_NAME: atrevidos
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código del repo
+        uses: actions/checkout@v4
+
+      - name: Normalizar el nombre del owner a minúsculas (requisito de GHCR)
+        id: vars
+        run: |
+          echo "owner_lower=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Iniciar sesión en GHCR con el GITHUB_TOKEN automático
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Construir y publicar la imagen (latest + tag con el SHA)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ steps.vars.outputs.owner_lower }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ steps.vars.outputs.owner_lower }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          # Mismos build-args que hoy pasa docker-compose.yml al build local.
+          # Los valores vienen de "Repository secrets" configurados a mano
+          # en GitHub (ver comentario arriba con los pasos manuales).
+          build-args: |
+            PUBLIC_SUPABASE_URL=${{ secrets.PUBLIC_SUPABASE_URL }}
+            PUBLIC_SUPABASE_ANON_KEY=${{ secrets.PUBLIC_SUPABASE_ANON_KEY }}
+            VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}
+            VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

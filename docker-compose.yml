@@ -21,6 +21,16 @@
 
 services:
   atrevidos:
+    # Imagen publicada por el pipeline de CI (.github/workflows/deploy.yml)
+    # en GitHub Container Registry en cada push a "main". Watchtower vigila
+    # este tag "latest" y recrea el contenedor solo cuando cambia.
+    image: ghcr.io/claudio-barrios-83/atrevidos:latest
+    # Se mantiene "build:" como fallback opcional: si se corre
+    # "docker compose up -d --build atrevidos" en este servidor, se sigue
+    # pudiendo construir la imagen localmente desde el código fuente (útil
+    # para debugging o si el pipeline de CI no está disponible). Cuando se
+    # define "image" junto a "build", Docker Compose usa "image" como el
+    # tag con el que se etiqueta el resultado del build local también.
     build:
       context: .
       dockerfile: Dockerfile
@@ -71,6 +81,46 @@ services:
       - "traefik.http.routers.atrevidos-insecure.entrypoints=web"
       - "traefik.http.routers.atrevidos-insecure.middlewares=atrevidos-https-redirect"
       - "traefik.http.middlewares.atrevidos-https-redirect.redirectscheme.scheme=https"
+      # Habilita a Watchtower (más abajo) a vigilar y actualizar SOLO este
+      # contenedor cuando cambie ghcr.io/claudio-barrios-83/atrevidos:latest.
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  # Watchtower: vigila la imagen ghcr.io/claudio-barrios-83/atrevidos:latest
+  # y recrea automáticamente el contenedor "atrevidos-app" cuando el pipeline
+  # de CI (.github/workflows/deploy.yml) publica una nueva versión tras un
+  # push a "main". Es el mecanismo de "deploy" en este servidor: no hay que
+  # hacer nada manual, Watchtower hace el pull + recreate.
+  #
+  # NOTA: la imagen histórica "containrrr/watchtower" quedó ARCHIVADA (sin
+  # mantenimiento) y su cliente Docker interno es demasiado viejo para la
+  # API de Docker Engine v29 que corre en este host (falla con "client
+  # version 1.25 is too old"). Usamos el fork activamente mantenido por la
+  # comunidad, "nicholas-fedor/watchtower" (drop-in compatible: mismos
+  # flags, mismas labels), que sí soporta Docker Engine 29+.
+  watchtower:
+    image: ghcr.io/nicholas-fedor/watchtower:latest
+    container_name: atrevidos-watchtower
+    command:
+      # --label-enable: solo actualiza contenedores con la label
+      # com.centurylinklabs.watchtower.enable=true (la agregamos arriba al
+      # servicio "atrevidos"), así Watchtower NO toca traefik, portainer,
+      # pihole, wireguard ni ningún otro contenedor de este host.
+      - "--label-enable"
+      # Poll cada 90s: rápido para verificar que el pipeline funciona sin
+      # ser agresivo. Para "producción real" más tranquila alcanza con algo
+      # como 300 (5 minutos); se deja en 90 a propósito para este primer
+      # despliegue, se puede subir después sin drama.
+      - "--interval"
+      - "90"
+      # Borra las imágenes viejas una vez que el contenedor nuevo arrancó
+      # sano, para no acumular versiones anteriores en disco.
+      - "--cleanup"
+    volumes:
+      # Watchtower necesita hablar con el daemon de Docker para poder
+      # inspeccionar/recrear contenedores. Montado read-only: Watchtower no
+      # necesita escribir en el socket, solo leer/enviar comandos sobre él.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
 
   # Servicio OPCIONAL: mantiene el registro DNS de atrevido55.duckdns.org
   # apuntando a la IP pública de este servidor. Actívalo con:
